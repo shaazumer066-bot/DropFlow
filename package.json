@@ -1,0 +1,16 @@
+{
+  "name": "dropflow",
+  "version": "1.0.0",
+  "description": "A frictionless file organization desktop app",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^44.3.0"
+  }
+}

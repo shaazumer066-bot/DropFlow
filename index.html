@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DropFlow</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #0f1115;
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 50px 30px;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 35px;
+    }
+
+    .choose-button {
+      border: none;
+      background: #ffffff;
+      color: #111111;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+      margin: 5px;
+    }
+
+    .choose-button:hover {
+      opacity: 0.85;
+    }
+
+    .choose-button:active {
+      transform: translateY(1px);
+    }
+
+    .choose-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .notice {
+      margin-top: 22px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .selected-folder {
+      margin-top: 18px;
+      color: #9ca3af;
+      font-size: 14px;
+      word-break: break-all;
+    }
+
+    #scan-results {
+      margin-top: 35px;
+      text-align: left;
+    }
+
+    #scan-results h2 {
+      margin-bottom: 18px;
+      font-size: 22px;
+    }
+
+    .file-table {
+      width: 100%;
+      border: 1px solid #252a33;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #13161c;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 15px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #252a33;
+      color: #d1d5db;
+    }
+
+    .file-row:last-child {
+      border-bottom: none;
+    }
+
+    .file-header {
+      font-weight: 600;
+      color: #ffffff;
+      background: #181b21;
+    }
+
+    .file-row span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #file-controls {
+  display: flex;
+  gap: 12px;
+  margin: 25px 0 15px;
+  text-align: left;
+}
+
+#file-search,
+#category-filter {
+  background: #181b21;
+  color: #ffffff;
+  border: 1px solid #252a33;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+#file-search {
+  flex: 1;
+}
+
+#category-filter {
+  width: 190px;
+  cursor: pointer;
+}
+
+#file-search:focus,
+#category-filter:focus {
+  border-color: #4b5563;
+}
+
+#category-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 28px 0 22px;
+  text-align: left;
+}
+
+.category-card {
+  background: #181b21;
+  border: 1px solid #252a33;
+  border-radius: 10px;
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-3px);
+  border-color: #3a4150;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.category-name {
+  color: #9ca3af;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+
+.category-count {
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+  </style>
+</head>
+
+<body>
+
+  <main class="container">
+    <div class="logo">DropFlow</div>
+
+    <p class="subtitle">
+      Keep your files organized.<br>
+      Automatically.
+    </p>
+
+    <button class="choose-button" id="choose-folder">
+      Choose Folder
+    </button>
+
+    <button class="choose-button" id="scan-folder" style="display: none;">
+      Scan Folder
+    </button>
+
+    <p class="selected-folder" id="selected-folder"></p>
+
+    <div id="category-summary"></div>
+    <div id="file-controls" style="display: none;">
+  <input type="text" id="file-search" placeholder="Search files...">
+
+  <select id="category-filter">
+    <option value="All">All categories</option>
+    <option value="Documents">Documents</option>
+    <option value="Images">Images</option>
+    <option value="Videos">Videos</option>
+    <option value="Archives">Archives</option>
+    <option value="Installers">Installers</option>
+    <option value="Other">Other</option>
+  </select>
+</div>
+
+<div id="scan-results"></div>
+
+    <p class="notice">
+      No files will be changed yet.
+    </p>
+  </main>
+
+  <script>
+    const chooseButton = document.getElementById("choose-folder");
+    const scanButton = document.getElementById("scan-folder");
+    const selectedFolder = document.getElementById("selected-folder");
+    const scanResults = document.getElementById("scan-results");
+    const fileControls = document.getElementById("file-controls");
+    const fileSearch = document.getElementById("file-search");
+    const categoryFilter = document.getElementById("category-filter");
+    const categorySummary = document.getElementById("category-summary");
+
+    let scannedFiles = [];
+
+    let currentFolder = null;
+
+    function fileRow(cells) {
+      const spans = cells.map(cell => `<span title="${cell}">${cell}</span>`).join("");
+      return `<div class="file-row">${spans}</div>`;
+    }
+
+    function fileRow(cells) {
+        const spans = cells.map(cell => `<span title="${cell}">${cell}</span>`).join("");
+        return `<div class="file-row">${spans}</div>`;
+    }
+    
+    function renderCategorySummary() {
+      const categories = {
+        Documents: 0,
+        Images: 0,
+        Videos: 0,
+        Archives: 0,
+        Installers: 0,
+        Other: 0
+      };
+
+      for (const file of scannedFiles) {
+        if (categories[file.category] !== undefined) {
+          categories[file.category]++;
+        }
+      }
+
+      categorySummary.innerHTML = Object.entries(categories)
+        .map(([category, count]) => `
+          <div class="category-card" data-category="${category}">
+          <div class="category-name">${category}</div>
+          <div class="category-count">${count}</div>
+          </div>
+        `)
+      .join("");
+
+      document.querySelectorAll(".category-card").forEach(card => {
+        card.addEventListener("click", () => {
+        categoryFilter.value = card.dataset.category;
+        renderFiles();
+      });
+      });
+    }
+
+    function renderFiles() {
+        const searchText = fileSearch.value.toLowerCase().trim();
+        const selectedCategory = categoryFilter.value;
+
+        const filteredFiles = scannedFiles.filter(file => {
+        const matchesSearch = file.name.toLowerCase().includes(searchText);
+        const matchesCategory = selectedCategory === "All" || file.category === selectedCategory;
+
+        return matchesSearch && matchesCategory;
+        });
+
+        const header = fileRow(["File name", "Type", "Category", "Size"]);
+        const rows = filteredFiles.length
+        ? filteredFiles.map(file => fileRow([file.name, file.extension, file.category, file.size])).join("")
+        : fileRow(["No matching files", "-", "-", "-"]);
+
+        scanResults.innerHTML = `
+        <h2>
+            ${filteredFiles.length} files shown
+            <span style="color: #6b7280; font-size: 14px;">(${scannedFiles.length} total)</span>
+        </h2>
+
+        <div class="file-table">
+        <div class="file-row file-header">${header.replace(/<div class="file-row">|<\/div>/g, "")}</div>
+        ${rows}
+        </div>
+        `;
+    }
+
+    chooseButton.addEventListener("click", async () => {
+      const folder = await window.dropflow.chooseFolder();
+      if (!folder) return;
+
+      currentFolder = folder;
+      selectedFolder.textContent = `Selected: ${folder}`;
+      scanButton.style.display = "inline-block";
+      scanResults.innerHTML = "";
+    });
+
+    scanButton.addEventListener("click", async () => {
+      if (!currentFolder) return;
+
+      scanButton.textContent = "Scanning...";
+      scanButton.disabled = true;
+
+      try {
+        const files = await window.dropflow.scanFolder(currentFolder);
+        scannedFiles = files;
+        categorySummary.style.display = "grid";
+        fileControls.style.display = "flex";
+        renderCategorySummary();
+        renderFiles();
+
+
+        const header = fileRow(["File name", "Type", "Category", "Size"]);
+        const rows = files.length
+          ? files.map(file => fileRow([file.name, file.extension, file.category, file.size])).join("")
+          : fileRow(["No files found", "-", "-", "-"]);
+
+        scanResults.innerHTML = `
+          <h2>${files.length} files found</h2>
+          <div class="file-table">
+            <div class="file-row file-header">${header.replace(/<div class="file-row">|<\/div>/g, "")}</div>
+            ${rows}
+          </div>
+        `;
+      } catch (error) {
+        console.error(error);
+        scanResults.innerHTML = "<p>Could not scan this folder.</p>";
+      } finally {
+        scanButton.textContent = "Scan Folder";
+        scanButton.disabled = false;
+      }
+    });
+
+    fileSearch.addEventListener("input", renderFiles);
+
+    categoryFilter.addEventListener("change", renderFiles);
+  </script>
+
+</body>
+</html>
