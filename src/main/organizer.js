@@ -82,7 +82,9 @@ function moveFileSafely(file) {
       success: false,
       skipped: true,
       reason: "conflict",
-      file: file.name
+      file: file.name,
+      sourcePath: file.sourcePath,
+      destinationPath: file.destinationPath
     };
   }
 
@@ -99,7 +101,9 @@ function moveFileSafely(file) {
     success: true,
     skipped: false,
     reason: null,
-    file: file.name
+    file: file.name,
+    sourcePath: file.sourcePath,
+    destinationPath: file.destinationPath
   };
 }
 

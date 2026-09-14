@@ -9,5 +9,7 @@ contextBridge.exposeInMainWorld("dropflow", {
   ipcRenderer.invoke("create-category-folders", folderPath),
   checkOrganizationConflicts: (folderPath) =>
   ipcRenderer.invoke("check-organization-conflicts",folderPath),
-  moveFileSafely: (file) => ipcRenderer.invoke("move-file-safely",file)
+  moveFileSafely: (file) => ipcRenderer.invoke("move-file-safely",file),
+  organizeFiles: (folderPath) => ipcRenderer.invoke("organize-files", folderPath),
+  undoOrganization: () => ipcRenderer.invoke("undo-organization")
 });

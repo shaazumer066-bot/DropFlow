@@ -390,6 +390,10 @@
       Organize Files
     </button>
 
+    <button class="choose-button" id="undo-organization" style="display: none;">
+      Undo Last Organization
+    </button>
+
     </div>
 
     <p class="selected-folder" id="selected-folder"></p>
@@ -431,6 +435,7 @@
     const organizationPreview = document.getElementById("organization-preview");
     const organizeButton = document.getElementById("organize-files");
     const organizationAction = document.getElementById("organization-action");
+    const undoButton = document.getElementById("undo-organization");
 
     let scannedFiles = [];
 
@@ -725,6 +730,203 @@ async function showOrganizationPreview() {
   }
 }
 
+async function organizeFiles() {
+  if (!currentFolder) {
+    organizationPreview.innerHTML = `
+      <div class="preview-header">
+        <h2>No folder selected</h2>
+        <p class="preview-subtitle">
+          Please choose a folder first.
+        </p>
+      </div>
+    `;
+
+    organizationPreview.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    return;
+  }
+
+  const confirmed = confirm(
+    "DropFlow will organize the files in this folder. " +
+    "Existing files will never be overwritten. Continue?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  organizeButton.textContent = "Organizing...";
+  organizeButton.disabled = true;
+
+  try {
+    const results =
+      await window.dropflow.organizeFiles(
+        currentFolder
+      );
+    
+    undoButton.style.display = "inline-block";
+
+    const successful = results.filter(
+      result => result.success
+    );
+
+    const skipped = results.filter(
+      result => result.skipped
+    );
+
+    const failed = results.filter(
+      result =>
+        !result.success &&
+        !result.skipped
+    );
+
+    organizationPreview.innerHTML = `
+      <div class="preview-header">
+
+        <h2>Organization Complete</h2>
+
+        <p class="preview-subtitle">
+          DropFlow finished organizing your files.
+        </p>
+
+        <div class="preview-summary">
+
+          <div class="preview-summary-card">
+            <span class="preview-summary-label">
+              Organized
+            </span>
+
+            <strong class="preview-organized">
+              ${successful.length}
+            </strong>
+          </div>
+
+          <div class="preview-summary-card">
+            <span class="preview-summary-label">
+              Skipped
+            </span>
+
+            <strong class="preview-conflict">
+              ${skipped.length}
+            </strong>
+          </div>
+
+          <div class="preview-summary-card">
+            <span class="preview-summary-label">
+              Failed
+            </span>
+
+            <strong class="preview-misplaced">
+              ${failed.length}
+            </strong>
+          </div>
+
+        </div>
+
+        <p class="preview-success">
+          ✓ No existing files were overwritten.
+        </p>
+
+      </div>
+
+      <div class="preview-table">
+
+        <div class="preview-row preview-header-row">
+          <span>File</span>
+          <span>Status</span>
+          <span>Result</span>
+        </div>
+
+        ${
+          results.length
+            ? results.map(result => {
+
+                let status = "✓ Organized";
+                let statusClass = "preview-organized";
+                let reason = "Moved successfully";
+
+                if (result.skipped) {
+                  status = "⚠ Skipped";
+                  statusClass = "preview-conflict";
+                  reason = "File already exists";
+                }
+
+                if (!result.success && !result.skipped) {
+                  status = "✕ Failed";
+                  statusClass = "preview-misplaced";
+                  reason = result.error || "Unknown error";
+                }
+
+                return `
+                  <div class="preview-row">
+
+                    <span title="${result.file}">
+                      ${result.file}
+                    </span>
+
+                    <span class="${statusClass}">
+                      ${status}
+                    </span>
+
+                    <span>
+                      ${reason}
+                    </span>
+
+                  </div>
+                `;
+              }).join("")
+            : `
+              <div class="preview-row">
+                <span>No files found</span>
+                <span>-</span>
+                <span>-</span>
+              </div>
+            `
+        }
+
+      </div>
+    `;
+
+    organizationPreview.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } catch (error) {
+    console.error(
+      "Organization failed:",
+      error
+    );
+
+    organizationPreview.innerHTML = `
+      <div class="preview-header">
+        <h2>Organization failed</h2>
+
+        <p class="preview-subtitle">
+          ${
+            error.message ||
+            "Could not organize the files."
+          }
+        </p>
+      </div>
+    `;
+
+    organizationPreview.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } finally {
+    organizeButton.textContent =
+      "Organize Files";
+
+    organizeButton.disabled = false;
+  }
+}
+
 async function showOrganizationConfirmation() {
   if (!currentFolder || scannedFiles.length === 0) {
     return;
@@ -879,6 +1081,115 @@ async function showOrganizationConfirmation() {
     });
 }
 
+async function undoOrganization() {
+  const confirmed = confirm(
+    "Undo the last organization? " +
+    "Files will be moved back to their original locations."
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  undoButton.textContent = "Undoing...";
+  undoButton.disabled = true;
+
+  try {
+    const result =
+      await window.dropflow.undoOrganization();
+
+    organizationPreview.innerHTML = `
+      <div class="preview-header">
+
+        <h2>Undo Complete</h2>
+
+        <p class="preview-subtitle">
+          DropFlow restored the files from the
+          last organization.
+        </p>
+
+        <div class="preview-summary">
+
+          <div class="preview-summary-card">
+            <span class="preview-summary-label">
+              Restored
+            </span>
+
+            <strong class="preview-organized">
+              ${result.restored}
+            </strong>
+          </div>
+
+          <div class="preview-summary-card">
+            <span class="preview-summary-label">
+              Failed
+            </span>
+
+            <strong class="preview-conflict">
+              ${result.failed}
+            </strong>
+          </div>
+
+        </div>
+
+        ${
+          result.failed === 0
+            ? `
+              <p class="preview-success">
+                ✓ All possible files were restored.
+              </p>
+            `
+            : `
+              <p class="preview-warning">
+                ⚠ ${result.failed}
+                ${
+                  result.failed === 1
+                    ? "file could not"
+                    : "files could not"
+                } be restored.
+              </p>
+            `
+        }
+
+      </div>
+    `;
+
+    undoButton.style.display = "none";
+
+    organizationPreview.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } catch (error) {
+    console.error("Undo failed:", error);
+
+    organizationPreview.innerHTML = `
+      <div class="preview-header">
+        <h2>Undo failed</h2>
+
+        <p class="preview-subtitle">
+          ${
+            error.message ||
+            "Could not undo the last organization."
+          }
+        </p>
+      </div>
+    `;
+
+  } finally {
+    undoButton.textContent =
+      "Undo Last Organization";
+
+    undoButton.disabled = false;
+  }
+}
+
+undoButton.addEventListener(
+  "click",
+  undoOrganization
+);
+
     previewButton.addEventListener(
     "click",
     showOrganizationPreview
@@ -899,9 +1210,14 @@ async function showOrganizationConfirmation() {
     });
 
     organizeButton.addEventListener(
-  "click",
-  showOrganizationConfirmation
-);
+      "click",
+    organizeFiles
+    );  
+
+    organizeButton.addEventListener(
+      "click",
+    showOrganizationConfirmation
+    );
 
     scanButton.addEventListener("click", async () => {
       if (!currentFolder) return;

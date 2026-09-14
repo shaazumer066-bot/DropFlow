@@ -1,14 +1,15 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
-
 const { scanFolder } = require("./fileScanner");
-
+const fs = require("fs");
 const {
   createOrganizationPlan,
   createCategoryFolders,
   checkOrganizationConflicts,
   moveFileSafely
 } = require("./organizer");
+
+let lastOrganizationResults = [];
 
 function createWindow() {
    const win = new BrowserWindow({
@@ -84,6 +85,105 @@ ipcMain.handle(
     }
   }
 );
+
+ipcMain.handle("organize-files", async (event, folderPath) => {
+  try {
+    const files = scanFolder(folderPath);
+    const plan = createOrganizationPlan(files, folderPath);
+
+    const results = [];
+
+    for (const file of plan) {
+      try {
+        const result = moveFileSafely(file);
+        results.push(result);
+      } catch (error) {
+        console.error(`Could not move ${file.name}:`, error);
+
+        results.push({
+          success: false,
+          skipped: false,
+          reason: "error",
+          file: file.name,
+          sourcePath: file.sourcePath,
+          destinationPath: file.destinationPath,
+          error: error.message
+        });
+      }
+    }
+
+    lastOrganizationResults = results.filter(
+      result =>
+        result.success &&
+        result.sourcePath &&
+        result.destinationPath
+    );
+
+    return results;
+
+  } catch (error) {
+    console.error("Organization failed:", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("undo-organization", async () => {
+  try {
+    if (lastOrganizationResults.length === 0) {
+      return {
+        success: false,
+        restored: 0,
+        failed: 0,
+        message: "There is no organization to undo."
+      };
+    }
+
+    let restored = 0;
+    let failed = 0;
+
+    for (const file of lastOrganizationResults) {
+      try {
+        if (!fs.existsSync(file.destinationPath)) {
+          failed++;
+          continue;
+        }
+
+        if (fs.existsSync(file.sourcePath)) {
+          failed++;
+          continue;
+        }
+
+        fs.renameSync(
+          file.destinationPath,
+          file.sourcePath
+        );
+
+        restored++;
+
+      } catch (error) {
+        console.error(
+          `Could not restore ${file.file}:`,
+          error
+        );
+
+        failed++;
+      }
+    }
+
+    lastOrganizationResults = [];
+
+    return {
+      success: true,
+      restored,
+      failed,
+      message: "Undo completed."
+    };
+
+  } catch (error) {
+    console.error("Undo failed:", error);
+    throw error;
+  }
+});
 
 ipcMain.handle(
   "check-organization-conflicts",
