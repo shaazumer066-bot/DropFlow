@@ -9,6 +9,15 @@ const CATEGORY_MAP = {
   Installers: [".exe", ".msi"]
 };
 
+const CATEGORY_FOLDERS = [
+  "Documents",
+  "Images",
+  "Videos",
+  "Archives",
+  "Installers",
+  "Other"
+];
+
 function getFileCategory(extension) {
   const ext = extension.toLowerCase();
 
@@ -38,23 +47,63 @@ function formatFileSize(bytes) {
 }
 
 function scanFolder(folderPath) {
-  const entries = fs.readdirSync(folderPath, { withFileTypes: true });
+  const files = [];
 
-  return entries
-    .filter(entry => entry.isFile())
-    .map(entry => {
-      const filePath = path.join(folderPath, entry.name);
-      const extension = path.extname(entry.name);
-      const stats = fs.statSync(filePath);
-
-      return {
-        name: entry.name,
-        path: filePath,
-        extension: extension || "File",
-        category: getFileCategory(extension),
-        size: formatFileSize(stats.size)
-      };
+  function scanDirectory(currentPath) {
+    const entries = fs.readdirSync(currentPath, {
+      withFileTypes: true
     });
+
+    for (const entry of entries) {
+      const entryPath = path.join(currentPath, entry.name);
+
+      if (entry.isDirectory()) {
+        scanDirectory(entryPath);
+        continue;
+      }
+
+      if (!entry.isFile()) {
+        continue;
+      }
+
+      const extension = path.extname(entry.name);
+      const stats = fs.statSync(entryPath);
+
+      const relativePath = path.relative(
+        folderPath,
+        entryPath
+      );
+
+      const pathParts = relativePath.split(path.sep);
+
+      const parentFolder =
+        pathParts.length > 1
+          ? pathParts[0]
+          : null;
+
+      const detectedCategory =
+        getFileCategory(extension);
+
+      const alreadyOrganized =
+        parentFolder &&
+        CATEGORY_FOLDERS.includes(parentFolder) &&
+        parentFolder === detectedCategory;
+
+      files.push({
+        name: entry.name,
+        path: entryPath,
+        extension: extension || "File",
+        category: detectedCategory,
+        size: formatFileSize(stats.size),
+        parentFolder,
+        alreadyOrganized
+      });
+    }
+  }
+
+  scanDirectory(folderPath);
+
+  return files;
 }
 
 module.exports = {
