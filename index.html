@@ -561,6 +561,35 @@
   font-size: 12px;
   margin-top: 3px;
 }
+
+.clear-filter-button {
+  border: 1px solid #252a33;
+  background: #181b21;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.clear-filter-button:hover {
+  background: #20242c;
+}
+
+.results-heading {
+  margin: 25px 0 15px;
+}
+
+.results-heading h2 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.results-heading p {
+  color: #6b7280;
+  font-size: 13px;
+}
   </style>
 </head>
 
@@ -651,19 +680,23 @@
 
       <div id="category-summary"></div>
 
-      <div id="file-controls" style="display: none;">
-        <input type="text" id="file-search" placeholder="Search files...">
+    <div id="file-controls" style="display: none;">
+      <input type="text" id="file-search" placeholder="Search files...">
 
-        <select id="category-filter">
-          <option value="All">All categories</option>
-          <option value="Documents">Documents</option>
-          <option value="Images">Images</option>
-          <option value="Videos">Videos</option>
-          <option value="Archives">Archives</option>
-          <option value="Installers">Installers</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
+      <select id="category-filter">
+        <option value="All">All categories</option>
+        <option value="Documents">Documents</option>
+        <option value="Images">Images</option>
+        <option value="Videos">Videos</option>
+        <option value="Archives">Archives</option>
+        <option value="Installers">Installers</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <button class="clear-filter-button" id="clear-filters">
+        Clear
+      </button>
+    </div>
 
       <div id="scan-results"></div>
 
@@ -752,6 +785,8 @@
 
     const duplicateResults = document.getElementById("duplicate-results");
 
+    const clearFiltersButton = document.getElementById("clear-filters");
+
     let scannedFiles = [];
     let currentFolder = null;
     let currentScreen = "home";
@@ -834,70 +869,81 @@
 }
 
     function renderFiles() {
-      const searchText =
-        fileSearch.value.toLowerCase().trim();
+  const searchText =
+    fileSearch.value.toLowerCase().trim();
 
-      const selectedCategory =
-        categoryFilter.value;
+  const selectedCategory =
+    categoryFilter.value;
 
-      const filteredFiles =
-        scannedFiles.filter(file => {
-          const matchesSearch =
-            file.name.toLowerCase().includes(searchText);
+  const filteredFiles =
+    scannedFiles.filter(file => {
+      const matchesSearch =
+        file.name.toLowerCase().includes(searchText);
 
-          const matchesCategory =
-            selectedCategory === "All" ||
-            file.category === selectedCategory;
+      const matchesCategory =
+        selectedCategory === "All" ||
+        file.category === selectedCategory;
 
-          return matchesSearch && matchesCategory;
-        });
+      return matchesSearch && matchesCategory;
+    });
 
-      const header =
-        fileRow([
-          "File name",
-          "Type",
-          "Category",
-          "Size"
+  const filtersActive =
+    searchText !== "" ||
+    selectedCategory !== "All";
+
+  const header =
+    fileRow([
+      "File name",
+      "Type",
+      "Category",
+      "Size"
+    ]);
+
+  const rows =
+    filteredFiles.length
+      ? filteredFiles
+          .map(file =>
+            fileRow([
+              file.name,
+              file.extension,
+              file.category,
+              file.size
+            ])
+          )
+          .join("")
+      : fileRow([
+          "No matching files",
+          "-",
+          "-",
+          "-"
         ]);
 
-      const rows =
-        filteredFiles.length
-          ? filteredFiles
-              .map(file =>
-                fileRow([
-                  file.name,
-                  file.extension,
-                  file.category,
-                  file.size
-                ])
-              )
-              .join("")
-          : fileRow([
-              "No matching files",
-              "-",
-              "-",
-              "-"
-            ]);
+  scanResults.innerHTML = `
+    <div class="results-heading">
+      <div>
+        <h2>${filteredFiles.length} files shown</h2>
+        <p>
+          ${
+            filtersActive
+              ? `Filtered from ${scannedFiles.length} files`
+              : `Showing all ${scannedFiles.length} files`
+          }
+        </p>
+      </div>
+    </div>
 
-      scanResults.innerHTML = `
-        <h2 style="margin-bottom: 18px;">
-          ${filteredFiles.length} files shown
-          <span style="color: #6b7280; font-size: 14px;">
-            (${scannedFiles.length} total)
-          </span>
-        </h2>
+    <div class="file-table">
+      <div class="file-row file-header">
+        ${header.replace(
+          /<div class="file-row">|<\/div>/g,
+          ""
+        )}
+      </div>
 
-        <div class="file-table">
-          <div class="file-row file-header">
-            ${header.replace(
-              /<div class="file-row">|<\/div>/g,
-              ""
-            )}
-          </div>
-          ${rows}
-        </div>
-      `;
-    }
+      ${rows}
+    </div>
+  `;
+}
 
     async function scanCurrentFolder() {
       if (!currentFolder) {
@@ -1580,6 +1626,15 @@
         showOrganizationConfirmation();
       }
     );
+
+    clearFiltersButton.addEventListener(
+      "click",
+      () => {
+        fileSearch.value = "";
+        categoryFilter.value = "All";
+      renderFiles();
+    }
+);
   </script>
 
 </body>
