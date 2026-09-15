@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld("dropflow", {
   ipcRenderer.invoke("check-organization-conflicts",folderPath),
   moveFileSafely: (file) => ipcRenderer.invoke("move-file-safely",file),
   organizeFiles: (folderPath) => ipcRenderer.invoke("organize-files", folderPath),
-  undoOrganization: () => ipcRenderer.invoke("undo-organization")
+  undoOrganization: () => ipcRenderer.invoke("undo-organization"),
+  findDuplicates: (folderPath) => ipcRenderer.invoke("find-duplicates", folderPath)
 });

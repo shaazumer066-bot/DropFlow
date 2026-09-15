@@ -359,6 +359,22 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+#duplicate-results {
+  margin-top: 35px;
+  text-align: left;
+}
+
+.duplicate-group {
+  border-bottom: 1px solid #252a33;
+}
+
+.duplicate-group-title {
+  padding: 14px 18px;
+  background: #181b21;
+  color: #ffffff;
+  font-weight: 600;
+}
   </style>
 </head>
 
@@ -394,6 +410,10 @@
       Undo Last Organization
     </button>
 
+    <button class="choose-button" id="find-duplicates">
+      Find Duplicates
+    </button>
+
     </div>
 
     <p class="selected-folder" id="selected-folder"></p>
@@ -416,6 +436,7 @@
 <div id="scan-results"></div>
 <div id="organization-preview"></div>
 <div id="organization-action"></div>
+<div id="duplicate-results"></div>
 
     <p class="notice">
       No files will be changed yet.
@@ -436,6 +457,8 @@
     const organizeButton = document.getElementById("organize-files");
     const organizationAction = document.getElementById("organization-action");
     const undoButton = document.getElementById("undo-organization");
+    const duplicateButton = document.getElementById("find-duplicates");
+    const duplicateResults = document.getElementById("duplicate-results");
 
     let scannedFiles = [];
 
@@ -1258,6 +1281,223 @@ undoButton.addEventListener(
         scanButton.disabled = false;
       }
     });
+
+async function showDuplicates() {
+  if (!currentFolder) {
+    duplicateResults.innerHTML = `
+      <p class="notice">
+        Please choose a folder first.
+      </p>
+    `;
+    return;
+  }
+
+  duplicateButton.textContent = "Finding Duplicates...";
+  duplicateButton.disabled = true;
+
+  try {
+    const duplicateGroups =
+      await window.dropflow.findDuplicates(
+        currentFolder
+      );
+
+    if (duplicateGroups.length === 0) {
+      duplicateResults.innerHTML = `
+        <div class="preview-header">
+          <h2>No Duplicates Found</h2>
+
+          <p class="preview-subtitle">
+            DropFlow didn't find any duplicate files
+            in this folder.
+          </p>
+
+          <p class="preview-success">
+            ✓ Your folder looks clean.
+          </p>
+        </div>
+      `;
+    } else {
+      let duplicateFileCount = 0;
+      let duplicateStorage = 0;
+
+      const processedGroups =
+        duplicateGroups.map(group => {
+          const sortedGroup = [...group].sort(
+            (a, b) => {
+              const aName = a.name.toLowerCase();
+              const bName = b.name.toLowerCase();
+
+              const aCopyScore =
+                (aName.includes("copy") ? 1 : 0) +
+                (/\(\d+\)/.test(aName) ? 1 : 0);
+
+              const bCopyScore =
+                (bName.includes("copy") ? 1 : 0) +
+                (/\(\d+\)/.test(bName) ? 1 : 0);
+
+              return aCopyScore - bCopyScore;
+            }
+          );
+
+          const duplicates =
+            sortedGroup.slice(1);
+
+          duplicateFileCount += duplicates.length;
+
+          for (const file of duplicates) {
+            duplicateStorage += file.size;
+          }
+
+          return sortedGroup;
+        });
+
+      function formatStorage(bytes) {
+        if (bytes < 1024) {
+          return `${bytes} B`;
+        }
+
+        if (bytes < 1024 * 1024) {
+          return `${(bytes / 1024).toFixed(1)} KB`;
+        }
+
+        if (bytes < 1024 * 1024 * 1024) {
+          return `${(
+            bytes /
+            (1024 * 1024)
+          ).toFixed(1)} MB`;
+        }
+
+        return `${(
+          bytes /
+          (1024 * 1024 * 1024)
+        ).toFixed(1)} GB`;
+      }
+
+      duplicateResults.innerHTML = `
+        <div class="preview-header">
+
+          <h2>Duplicate Analysis</h2>
+
+          <p class="preview-subtitle">
+            Found ${duplicateGroups.length}
+            duplicate group${
+              duplicateGroups.length === 1
+                ? ""
+                : "s"
+            }.
+          </p>
+
+          <div class="preview-summary">
+
+            <div class="preview-summary-card">
+              <span class="preview-summary-label">
+                Duplicate Files
+              </span>
+
+              <strong>
+                ${duplicateFileCount}
+              </strong>
+            </div>
+
+            <div class="preview-summary-card">
+              <span class="preview-summary-label">
+                Potential Storage Saved
+              </span>
+
+              <strong>
+                ${formatStorage(duplicateStorage)}
+              </strong>
+            </div>
+
+          </div>
+
+          <p class="preview-warning">
+            Nothing will be deleted.
+          </p>
+
+        </div>
+
+        <div class="preview-table">
+
+          ${processedGroups.map(
+            (group, index) => `
+              <div class="duplicate-group">
+
+                <div class="duplicate-group-title">
+                  Duplicate Group ${index + 1}
+                </div>
+
+                ${group.map(
+                  (file, fileIndex) => `
+                    <div class="preview-row">
+
+                      <span title="${file.name}">
+                        ${file.name}
+                      </span>
+
+                      <span>
+                        ${formatStorage(file.size)}
+                      </span>
+
+                      <span class="${
+                        fileIndex === 0
+                          ? "preview-ready"
+                          : "preview-warning"
+                      }">
+                        ${
+                          fileIndex === 0
+                            ? "✓ Original"
+                            : "Duplicate"
+                        }
+                      </span>
+
+                    </div>
+                  `
+                ).join("")}
+
+              </div>
+            `
+          ).join("")}
+
+        </div>
+      `;
+    }
+
+    duplicateResults.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } catch (error) {
+    console.error(
+      "Duplicate detection failed:",
+      error
+    );
+
+    duplicateResults.innerHTML = `
+      <div class="preview-header">
+        <h2>Duplicate scan failed</h2>
+
+        <p class="preview-subtitle">
+          ${
+            error.message ||
+            "Could not find duplicate files."
+          }
+        </p>
+      </div>
+    `;
+  } finally {
+    duplicateButton.textContent =
+      "Find Duplicates";
+
+    duplicateButton.disabled = false;
+  }
+}
+
+duplicateButton.addEventListener(
+  "click",
+  showDuplicates
+);
 
     fileSearch.addEventListener("input", renderFiles);
 

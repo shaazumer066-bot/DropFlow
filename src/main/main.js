@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const { scanFolder } = require("./fileScanner");
+const { findDuplicates } = require("./duplicateScanner");
 const fs = require("fs");
 const {
   createOrganizationPlan,
@@ -243,5 +244,14 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
+  }
+});
+
+ipcMain.handle("find-duplicates", async (event, folderPath) => {
+  try {
+    return findDuplicates(folderPath);
+  } catch (error) {
+    console.error("Duplicate scan failed:", error);
+    throw error;
   }
 });
