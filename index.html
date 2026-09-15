@@ -505,6 +505,62 @@
         grid-template-columns: 1.5fr 1fr 1fr;
       }
     }
+
+    .scan-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 18px;
+  margin: 25px 0 20px;
+  background: #181b21;
+  border: 1px solid #252a33;
+  border-radius: 12px;
+}
+
+.scan-folder-label {
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.scan-folder-path {
+  color: #d1d5db;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.scan-file-count {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.scan-file-count strong {
+  display: block;
+  font-size: 25px;
+}
+
+.scan-file-count span {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+@media (max-width: 650px) {
+  .scan-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .scan-file-count {
+    text-align: left;
+  }
+}
+
+.category-files {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 3px;
+}
   </style>
 </head>
 
@@ -579,6 +635,18 @@
         <button class="choose-button" id="scan-again">
           Scan Folder
         </button>
+      </div>
+  
+      <div class="scan-info">
+        <div>
+          <div class="scan-folder-label">Current folder</div>
+          <div class="scan-folder-path" id="scan-folder-path"></div>
+        </div>
+
+        <div class="scan-file-count">
+          <strong id="scan-total-count">0</strong>
+          <span>files found</span>
+        </div>
       </div>
 
       <div id="category-summary"></div>
@@ -730,37 +798,40 @@
     }
 
     function renderCategorySummary() {
-      const categories = {
-        Documents: 0,
-        Images: 0,
-        Videos: 0,
-        Archives: 0,
-        Installers: 0,
-        Other: 0
-      };
+  const categories = {
+    Documents: 0,
+    Images: 0,
+    Videos: 0,
+    Archives: 0,
+    Installers: 0,
+    Other: 0
+  };
 
-      for (const file of scannedFiles) {
-        if (categories[file.category] !== undefined) {
-          categories[file.category]++;
-        }
-      }
-
-      categorySummary.innerHTML = Object.entries(categories)
-        .map(([category, count]) => `
-          <div class="category-card" data-category="${category}">
-            <div class="category-name">${category}</div>
-            <div class="category-count">${count}</div>
-          </div>
-        `)
-        .join("");
-
-      document.querySelectorAll(".category-card").forEach(card => {
-        card.addEventListener("click", () => {
-          categoryFilter.value = card.dataset.category;
-          renderFiles();
-        });
-      });
+  for (const file of scannedFiles) {
+    if (categories[file.category] !== undefined) {
+      categories[file.category]++;
     }
+  }
+
+  categorySummary.innerHTML = Object.entries(categories)
+    .map(([category, count]) => `
+      <div class="category-card" data-category="${category}">
+        <div class="category-name">${category}</div>
+        <div class="category-count">${count}</div>
+        <div class="category-files">
+          ${count === 1 ? "file" : "files"}
+        </div>
+      </div>
+    `)
+    .join("");
+
+  document.querySelectorAll(".category-card").forEach(card => {
+    card.addEventListener("click", () => {
+      categoryFilter.value = card.dataset.category;
+      renderFiles();
+    });
+  });
+}
 
     function renderFiles() {
       const searchText =
@@ -843,6 +914,9 @@
           );
 
         scannedFiles = files;
+
+        document.getElementById("scan-folder-path").textContent = currentFolder;
+        document.getElementById("scan-total-count").textContent = scannedFiles.length;
 
         categorySummary.style.display = "grid";
         fileControls.style.display = "flex";
