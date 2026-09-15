@@ -12,35 +12,64 @@
       padding: 0;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
-    #organization-preview,
-    #organization-action {
-    scroll-margin-top: 20px;
-    }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       background: #0f1115;
       color: #ffffff;
       min-height: 100vh;
-      padding: 50px 30px;
+      padding: 35px 30px;
     }
 
     .container {
-      text-align: center;
       width: 100%;
       max-width: 1100px;
       margin: 0 auto;
     }
 
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 35px;
+    }
+
     .logo {
-      font-size: 48px;
+      font-size: 32px;
       font-weight: 700;
-      margin-bottom: 18px;
       letter-spacing: -0.5px;
+    }
+
+    .back-button {
+      border: 1px solid #252a33;
+      background: #181b21;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 14px;
+      display: none;
+    }
+
+    .back-button:hover {
+      background: #20242c;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .home-screen {
+      text-align: center;
+      padding-top: 70px;
+    }
+
+    .home-screen .logo {
+      font-size: 52px;
+      margin-bottom: 18px;
     }
 
     .subtitle {
@@ -50,17 +79,46 @@
       margin-bottom: 35px;
     }
 
+    .folder-box {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 18px;
+      background: #181b21;
+      border: 1px solid #252a33;
+      border-radius: 12px;
+      text-align: left;
+    }
+
+    .folder-label {
+      color: #6b7280;
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+
+    .selected-folder {
+      color: #d1d5db;
+      font-size: 14px;
+      word-break: break-all;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
     .choose-button {
       border: none;
       background: #ffffff;
       color: #111111;
-      padding: 14px 28px;
+      padding: 13px 23px;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: opacity 0.15s ease;
-      margin: 5px;
     }
 
     .choose-button:hover {
@@ -76,30 +134,102 @@
       cursor: not-allowed;
     }
 
-    .notice {
-      margin-top: 22px;
-      color: #6b7280;
-      font-size: 14px;
+    .secondary-button {
+      border: 1px solid #252a33;
+      background: #181b21;
+      color: #ffffff;
+      padding: 13px 23px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .selected-folder {
-      margin-top: 18px;
+    .secondary-button:hover {
+      background: #20242c;
+    }
+
+    .screen-title {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .screen-subtitle {
       color: #9ca3af;
-      font-size: 14px;
-      word-break: break-all;
+      font-size: 15px;
+      margin-bottom: 28px;
     }
 
-    #scan-results {
-      margin-top: 35px;
+    .section {
+      margin-top: 25px;
+    }
+
+    #category-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 28px 0 22px;
+    }
+
+    .category-card {
+      background: #181b21;
+      border: 1px solid #252a33;
+      border-radius: 10px;
+      padding: 18px 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
       text-align: left;
     }
 
-    #scan-results h2 {
-      margin-bottom: 18px;
-      font-size: 22px;
+    .category-card:hover {
+      transform: translateY(-3px);
+      border-color: #3a4150;
     }
 
-    .file-table {
+    .category-name {
+      color: #9ca3af;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .category-count {
+      font-size: 25px;
+      font-weight: 650;
+    }
+
+    #file-controls {
+      display: flex;
+      gap: 12px;
+      margin: 25px 0 15px;
+    }
+
+    #file-search,
+    #category-filter {
+      background: #181b21;
+      color: #ffffff;
+      border: 1px solid #252a33;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    #file-search {
+      flex: 1;
+    }
+
+    #category-filter {
+      width: 190px;
+      cursor: pointer;
+    }
+
+    #file-search:focus,
+    #category-filter:focus {
+      border-color: #4b5563;
+    }
+
+    .file-table,
+    .preview-table {
       width: 100%;
       border: 1px solid #252a33;
       border-radius: 12px;
@@ -116,7 +246,8 @@
       color: #d1d5db;
     }
 
-    .file-row:last-child {
+    .file-row:last-child,
+    .preview-row:last-child {
       border-bottom: none;
     }
 
@@ -126,354 +257,400 @@
       background: #181b21;
     }
 
-    .file-row span {
+    .file-row span,
+    .preview-row span {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    #file-controls {
-  display: flex;
-  gap: 12px;
-  margin: 25px 0 15px;
-  text-align: left;
-}
+    .preview-header {
+      margin-bottom: 20px;
+    }
 
-#file-search,
-#category-filter {
-  background: #181b21;
-  color: #ffffff;
-  border: 1px solid #252a33;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
+    .preview-header h2 {
+      margin-bottom: 7px;
+    }
 
-#file-search {
-  flex: 1;
-}
+    .preview-subtitle {
+      color: #9ca3af;
+      font-size: 14px;
+    }
 
-#category-filter {
-  width: 190px;
-  cursor: pointer;
-}
+    .preview-warning {
+      margin-top: 9px;
+      color: #f59e0b;
+      font-size: 14px;
+    }
 
-#file-search:focus,
-#category-filter:focus {
-  border-color: #4b5563;
-}
+    .preview-success {
+      margin-top: 9px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
 
-#category-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin: 28px 0 22px;
-  text-align: left;
-}
+    .preview-ready {
+      color: #9ca3af;
+    }
 
-.category-card {
-  background: #181b21;
-  border: 1px solid #252a33;
-  border-radius: 10px;
-  padding: 18px 16px;
-  cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color 0.2s ease,
-              box-shadow 0.2s ease;
-}
+    .preview-conflict {
+      color: #f59e0b;
+      font-weight: 600;
+    }
 
-.category-card:hover {
-  transform: translateY(-3px);
-  border-color: #3a4150;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-}
+    .preview-organized {
+      color: #9ca3af;
+    }
 
-.category-name {
-  color: #9ca3af;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  margin-bottom: 6px;
-}
+    .preview-misplaced {
+      color: #f59e0b;
+    }
 
-.category-count {
-  font-size: 25px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
+    .preview-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 2fr;
+      gap: 15px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #252a33;
+      color: #d1d5db;
+    }
 
-#organization-preview {
-  margin-top: 35px;
-  text-align: left;
-}
+    .preview-header-row {
+      font-weight: 600;
+      color: #ffffff;
+      background: #181b21;
+    }
 
-.preview-header {
-  margin-bottom: 18px;
-}
+    .preview-category {
+      color: #9ca3af;
+    }
 
-.preview-header h2 {
-  margin-bottom: 6px;
-}
+    .preview-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
 
-.preview-subtitle {
-  color: #9ca3af;
-  font-size: 14px;
-}
+    .preview-summary-card {
+      background: #181b21;
+      border: 1px solid #252a33;
+      border-radius: 10px;
+      padding: 14px;
+    }
 
-.preview-table {
-  width: 100%;
-  border: 1px solid #252a33;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #13161c;
-}
+    .preview-summary-label {
+      display: block;
+      color: #9ca3af;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
 
-.preview-row {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 2fr;
-  gap: 15px;
-  padding: 14px 18px;
-  border-bottom: 1px solid #252a33;
-  color: #d1d5db;
-}
+    .preview-summary-card strong {
+      font-size: 24px;
+    }
 
-.preview-row:last-child {
-  border-bottom: none;
-}
+    .organization-confirmation {
+      padding: 22px;
+      border: 1px solid #252a33;
+      border-radius: 12px;
+      background: #181b21;
+      text-align: center;
+    }
 
-.preview-header-row {
-  font-weight: 600;
-  color: #ffffff;
-  background: #181b21;
-}
+    .organization-confirmation h2 {
+      margin-bottom: 14px;
+    }
 
-.preview-row span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .organization-confirmation p {
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
 
-.preview-category {
-  color: #9ca3af;
-}
+    .cancel-button,
+    .confirm-button {
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 8px 4px 0;
+    }
 
-.preview-destination {
-  color: #9ca3af;
-  font-size: 13px;
-}
+    .cancel-button {
+      border: 1px solid #252a33;
+      background: transparent;
+      color: #ffffff;
+    }
 
-.preview-warning {
-  margin-top: 8px;
-  color: #f59e0b;
-  font-size: 14px;
-}
+    .confirm-button {
+      border: none;
+      background: #ffffff;
+      color: #111111;
+    }
 
-.preview-success {
-  margin-top: 8px;
-  color: #9ca3af;
-  font-size: 14px;
-}
+    .duplicate-group {
+      border-bottom: 1px solid #252a33;
+    }
 
-.preview-ready {
-  color: #9ca3af;
-}
+    .duplicate-group:last-child {
+      border-bottom: none;
+    }
 
-.preview-conflict {
-  color: #f59e0b;
-  font-weight: 600;
-}
+    .duplicate-group-title {
+      padding: 14px 18px;
+      background: #181b21;
+      color: #ffffff;
+      font-weight: 600;
+    }
 
-#organization-action {
-  margin-top: 25px;
-  text-align: center;
-}
+    .notice {
+      margin-top: 22px;
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+    }
 
-.organization-confirmation {
-  padding: 20px;
-  border: 1px solid #252a33;
-  border-radius: 12px;
-  background: #181b21;
-}
+    .empty-state {
+      padding: 45px 20px;
+      text-align: center;
+      border: 1px solid #252a33;
+      border-radius: 12px;
+      background: #13161c;
+    }
 
-.organization-confirmation p {
-  color: #9ca3af;
-  margin-bottom: 16px;
-}
+    .empty-state p {
+      color: #9ca3af;
+      margin-top: 8px;
+    }
 
-.cancel-button {
-  border: 1px solid #252a33;
-  background: transparent;
-  color: #ffffff;
-  padding: 12px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-right: 8px;
-}
+    @media (max-width: 800px) {
+      .preview-summary {
+        grid-template-columns: 1fr;
+      }
 
-.confirm-button {
-  border: none;
-  background: #ffffff;
-  color: #111111;
-  padding: 12px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-}
+      #category-summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
 
-.button-area {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: 15px 0;
-  background: #0f1115;
-}
-
-.preview-summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin: 20px 0;
-}
-
-.preview-summary-card {
-  background: #181b21;
-  border: 1px solid #252a33;
-  border-radius: 10px;
-  padding: 14px;
-}
-
-.preview-summary-label {
-  display: block;
-  color: #9ca3af;
-  font-size: 12px;
-  margin-bottom: 6px;
-}
-
-.preview-summary-card strong {
-  font-size: 24px;
-}
-
-@media (max-width: 800px) {
-  .preview-summary {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-#duplicate-results {
-  margin-top: 35px;
-  text-align: left;
-}
-
-.duplicate-group {
-  border-bottom: 1px solid #252a33;
-}
-
-.duplicate-group-title {
-  padding: 14px 18px;
-  background: #181b21;
-  color: #ffffff;
-  font-weight: 600;
-}
+      .file-row,
+      .preview-row {
+        grid-template-columns: 1.5fr 1fr 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
 
   <main class="container">
-    <div class="logo">DropFlow</div>
 
-    <p class="subtitle">
-      Keep your files organized.<br>
-      Automatically.
-    </p>
-
-    <div class="button-area">
-
-    <button class="choose-button" id="choose-folder">
-      Choose Folder
-    </button>
-
-    <button class="choose-button" id="scan-folder" style="display: none;">
-      Scan Folder
-    </button>
-
-    <button class="choose-button" id="preview-organization" style="display: none;">
-      Preview Organization
-    </button>
-
-    <button class="choose-button" id="organize-files" style="display: none;">
-      Organize Files
-    </button>
-
-    <button class="choose-button" id="undo-organization" style="display: none;">
-      Undo Last Organization
-    </button>
-
-    <button class="choose-button" id="find-duplicates">
-      Find Duplicates
-    </button>
-
+    <div class="top-bar">
+      <div class="logo">DropFlow</div>
+      <button class="back-button" id="back-button">← Back</button>
     </div>
 
-    <p class="selected-folder" id="selected-folder"></p>
+    <section class="screen active" id="home-screen">
 
-    <div id="category-summary"></div>
-    <div id="file-controls" style="display: none;">
-  <input type="text" id="file-search" placeholder="Search files...">
+      <div class="home-screen">
 
-  <select id="category-filter">
-    <option value="All">All categories</option>
-    <option value="Documents">Documents</option>
-    <option value="Images">Images</option>
-    <option value="Videos">Videos</option>
-    <option value="Archives">Archives</option>
-    <option value="Installers">Installers</option>
-    <option value="Other">Other</option>
-  </select>
-</div>
+        <div class="logo">DropFlow</div>
 
-<div id="scan-results"></div>
-<div id="organization-preview"></div>
-<div id="organization-action"></div>
-<div id="duplicate-results"></div>
+        <p class="subtitle">
+          Keep your files organized.<br>
+          Automatically.
+        </p>
 
-    <p class="notice">
-      No files will be changed yet.
-    </p>
+        <div class="button-row">
+          <button class="choose-button" id="choose-folder">
+            Choose Folder
+          </button>
+        </div>
+
+        <div class="folder-box" id="folder-box" style="display: none;">
+          <div class="folder-label">Selected folder</div>
+          <div class="selected-folder" id="selected-folder"></div>
+        </div>
+
+        <div class="button-row" id="home-actions" style="display: none;">
+          <button class="choose-button" id="scan-folder">
+            Scan Folder
+          </button>
+
+          <button class="secondary-button" id="duplicates-home">
+            Find Duplicates
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="screen" id="scan-screen">
+
+      <h1 class="screen-title">Scan Folder</h1>
+
+      <p class="screen-subtitle">
+        Review the files inside your selected folder.
+      </p>
+
+      <div class="button-row" style="justify-content: flex-start;">
+        <button class="choose-button" id="scan-again">
+          Scan Folder
+        </button>
+      </div>
+
+      <div id="category-summary"></div>
+
+      <div id="file-controls" style="display: none;">
+        <input type="text" id="file-search" placeholder="Search files...">
+
+        <select id="category-filter">
+          <option value="All">All categories</option>
+          <option value="Documents">Documents</option>
+          <option value="Images">Images</option>
+          <option value="Videos">Videos</option>
+          <option value="Archives">Archives</option>
+          <option value="Installers">Installers</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div id="scan-results"></div>
+
+      <div class="button-row" id="scan-actions" style="display: none; justify-content: flex-start;">
+        <button class="choose-button" id="preview-organization">
+          Preview Organization
+        </button>
+
+        <button class="secondary-button" id="organize-files">
+          Organize Files
+        </button>
+      </div>
+
+    </section>
+
+    <section class="screen" id="organization-screen">
+
+      <h1 class="screen-title">Organization</h1>
+
+      <p class="screen-subtitle">
+        Review what DropFlow is going to do before changing anything.
+      </p>
+
+      <div id="organization-preview"></div>
+
+      <div id="organization-action"></div>
+
+    </section>
+
+    <section class="screen" id="duplicate-screen">
+
+      <h1 class="screen-title">Duplicate Analysis</h1>
+
+      <p class="screen-subtitle">
+        Find identical files and see how much storage they use.
+      </p>
+
+      <div class="button-row" style="justify-content: flex-start;">
+        <button class="choose-button" id="find-duplicates">
+          Find Duplicates
+        </button>
+      </div>
+
+      <div id="duplicate-results"></div>
+
+    </section>
+
   </main>
 
   <script>
+    const screens = {
+      home: document.getElementById("home-screen"),
+      scan: document.getElementById("scan-screen"),
+      organization: document.getElementById("organization-screen"),
+      duplicate: document.getElementById("duplicate-screen")
+    };
+
+    const backButton = document.getElementById("back-button");
+
     const chooseButton = document.getElementById("choose-folder");
-    const scanButton = document.getElementById("scan-folder");
+    const folderBox = document.getElementById("folder-box");
     const selectedFolder = document.getElementById("selected-folder");
+    const homeActions = document.getElementById("home-actions");
+
+    const scanButton = document.getElementById("scan-folder");
+    const scanAgainButton = document.getElementById("scan-again");
     const scanResults = document.getElementById("scan-results");
+    const scanActions = document.getElementById("scan-actions");
+
     const fileControls = document.getElementById("file-controls");
     const fileSearch = document.getElementById("file-search");
     const categoryFilter = document.getElementById("category-filter");
     const categorySummary = document.getElementById("category-summary");
-    const previewButton =document.getElementById("preview-organization");
-    const organizationPreview = document.getElementById("organization-preview");
+
+    const previewButton = document.getElementById("preview-organization");
     const organizeButton = document.getElementById("organize-files");
-    const organizationAction = document.getElementById("organization-action");
-    const undoButton = document.getElementById("undo-organization");
-    const duplicateButton = document.getElementById("find-duplicates");
-    const duplicateResults = document.getElementById("duplicate-results");
+
+    const organizationPreview =
+      document.getElementById("organization-preview");
+
+    const organizationAction =
+      document.getElementById("organization-action");
+
+    const duplicateButton =
+      document.getElementById("find-duplicates");
+
+    const duplicateHomeButton =
+      document.getElementById("duplicates-home");
+
+    const duplicateResults =
+      document.getElementById("duplicate-results");
 
     let scannedFiles = [];
-
     let currentFolder = null;
+    let currentScreen = "home";
+    let history = [];
+
+    function showScreen(screenName, addHistory = true) {
+      if (!screens[screenName]) {
+        return;
+      }
+
+      if (addHistory && currentScreen !== screenName) {
+        history.push(currentScreen);
+      }
+
+      Object.values(screens).forEach(screen => {
+        screen.classList.remove("active");
+      });
+
+      screens[screenName].classList.add("active");
+      currentScreen = screenName;
+
+      backButton.style.display =
+        screenName === "home"
+          ? "none"
+          : "inline-block";
+    }
+
+    backButton.addEventListener("click", () => {
+      if (history.length === 0) {
+        showScreen("home", false);
+        return;
+      }
+
+      const previousScreen = history.pop();
+      showScreen(previousScreen, false);
+    });
 
     function fileRow(cells) {
-      const spans = cells.map(cell => `<span title="${cell}">${cell}</span>`).join("");
+      const spans = cells
+        .map(cell => `<span title="${cell}">${cell}</span>`)
+        .join("");
+
       return `<div class="file-row">${spans}</div>`;
     }
 
-    function fileRow(cells) {
-        const spans = cells.map(cell => `<span title="${cell}">${cell}</span>`).join("");
-        return `<div class="file-row">${spans}</div>`;
-    }
-    
     function renderCategorySummary() {
       const categories = {
         Documents: 0,
@@ -493,517 +670,137 @@
       categorySummary.innerHTML = Object.entries(categories)
         .map(([category, count]) => `
           <div class="category-card" data-category="${category}">
-          <div class="category-name">${category}</div>
-          <div class="category-count">${count}</div>
+            <div class="category-name">${category}</div>
+            <div class="category-count">${count}</div>
           </div>
         `)
-      .join("");
+        .join("");
 
       document.querySelectorAll(".category-card").forEach(card => {
         card.addEventListener("click", () => {
-        categoryFilter.value = card.dataset.category;
-        renderFiles();
-      });
+          categoryFilter.value = card.dataset.category;
+          renderFiles();
+        });
       });
     }
 
     function renderFiles() {
-        const searchText = fileSearch.value.toLowerCase().trim();
-        const selectedCategory = categoryFilter.value;
+      const searchText =
+        fileSearch.value.toLowerCase().trim();
 
-        const filteredFiles = scannedFiles.filter(file => {
-        const matchesSearch = file.name.toLowerCase().includes(searchText);
-        const matchesCategory = selectedCategory === "All" || file.category === selectedCategory;
+      const selectedCategory =
+        categoryFilter.value;
 
-        return matchesSearch && matchesCategory;
+      const filteredFiles =
+        scannedFiles.filter(file => {
+          const matchesSearch =
+            file.name.toLowerCase().includes(searchText);
+
+          const matchesCategory =
+            selectedCategory === "All" ||
+            file.category === selectedCategory;
+
+          return matchesSearch && matchesCategory;
         });
 
-        const header = fileRow(["File name", "Type", "Category", "Size"]);
-        const rows = filteredFiles.length
-        ? filteredFiles.map(file => fileRow([file.name, file.extension, file.category, file.size])).join("")
-        : fileRow(["No matching files", "-", "-", "-"]);
+      const header =
+        fileRow([
+          "File name",
+          "Type",
+          "Category",
+          "Size"
+        ]);
 
-        scanResults.innerHTML = `
-        <h2>
-            ${filteredFiles.length} files shown
-            <span style="color: #6b7280; font-size: 14px;">(${scannedFiles.length} total)</span>
+      const rows =
+        filteredFiles.length
+          ? filteredFiles
+              .map(file =>
+                fileRow([
+                  file.name,
+                  file.extension,
+                  file.category,
+                  file.size
+                ])
+              )
+              .join("")
+          : fileRow([
+              "No matching files",
+              "-",
+              "-",
+              "-"
+            ]);
+
+      scanResults.innerHTML = `
+        <h2 style="margin-bottom: 18px;">
+          ${filteredFiles.length} files shown
+          <span style="color: #6b7280; font-size: 14px;">
+            (${scannedFiles.length} total)
+          </span>
         </h2>
 
         <div class="file-table">
-        <div class="file-row file-header">${header.replace(/<div class="file-row">|<\/div>/g, "")}</div>
-        ${rows}
+          <div class="file-row file-header">
+            ${header.replace(
+              /<div class="file-row">|<\/div>/g,
+              ""
+            )}
+          </div>
+          ${rows}
         </div>
-        `;
+      `;
     }
 
-async function showOrganizationPreview() {
-  if (!currentFolder) {
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-        <h2>No folder selected</h2>
-        <p class="preview-subtitle">
-          Please choose a folder first.
-        </p>
-      </div>
-    `;
-    return;
-  }
+    async function scanCurrentFolder() {
+      if (!currentFolder) {
+        return;
+      }
 
-  previewButton.textContent = "Creating Preview...";
-  previewButton.disabled = true;
+      scanAgainButton.textContent = "Scanning...";
+      scanAgainButton.disabled = true;
 
-  try {
-    console.log(
-      "Checking organization conflicts for:",
-      currentFolder
-    );
+      try {
+        const files =
+          await window.dropflow.scanFolder(
+            currentFolder
+          );
 
-    const plan =
-      await window.dropflow.checkOrganizationConflicts(
-        currentFolder
-      );
+        scannedFiles = files;
 
-    console.log("Organization plan:", plan);
+        categorySummary.style.display = "grid";
+        fileControls.style.display = "flex";
+        scanActions.style.display = "flex";
 
-    const alreadyOrganized = plan.filter(
-      file => file.status === "organized"
-    );
+        renderCategorySummary();
+        renderFiles();
 
-    const misplacedFiles = plan.filter(
-      file => file.status === "misplaced"
-    );
+      } catch (error) {
+        console.error(error);
 
-    const conflictFiles = plan.filter(
-      file => file.conflict
-    );
-
-    const readyFiles = plan.filter(
-      file =>
-        file.status !== "organized" &&
-        !file.conflict
-    );
-
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-
-        <h2>Organization Preview</h2>
-
-        <p class="preview-subtitle">
-          ${plan.length} files scanned.
-          Nothing will be changed.
-        </p>
-
-        <div class="preview-summary">
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Already organized
-            </span>
-
-            <strong class="preview-organized">
-              ${alreadyOrganized.length}
-            </strong>
+        scanResults.innerHTML = `
+          <div class="empty-state">
+            <h2>Scan failed</h2>
+            <p>Could not scan this folder.</p>
           </div>
+        `;
+      } finally {
+        scanAgainButton.textContent = "Scan Folder";
+        scanAgainButton.disabled = false;
+      }
+    }
 
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Ready to move
-            </span>
-
-            <strong class="preview-ready">
-              ${readyFiles.length}
-            </strong>
+    async function showOrganizationPreview() {
+      if (!currentFolder) {
+        organizationPreview.innerHTML = `
+          <div class="empty-state">
+            <h2>No folder selected</h2>
+            <p>Please choose a folder first.</p>
           </div>
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Misplaced
-            </span>
-
-            <strong class="preview-misplaced">
-              ${misplacedFiles.length}
-            </strong>
-          </div>
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Conflicts
-            </span>
-
-            <strong class="preview-conflict">
-              ${conflictFiles.length}
-            </strong>
-          </div>
-
-        </div>
-
-        ${
-          conflictFiles.length > 0
-            ? `
-              <p class="preview-warning">
-                ⚠ ${conflictFiles.length}
-                ${
-                  conflictFiles.length === 1
-                    ? "conflict"
-                    : "conflicts"
-                } found.
-                These files will not be overwritten.
-              </p>
-            `
-            : `
-              <p class="preview-success">
-                ✓ No conflicts found.
-              </p>
-            `
-        }
-
-      </div>
-
-      <div class="preview-table">
-
-        <div class="preview-row preview-header-row">
-          <span>File</span>
-          <span>Category</span>
-          <span>Status</span>
-        </div>
-
-        ${
-          plan.length
-            ? plan.map(file => {
-
-                let statusText = "→ Ready";
-                let statusClass = "preview-ready";
-
-                if (file.status === "organized") {
-                  statusText = "✓ Already organized";
-                  statusClass = "preview-organized";
-
-                } else if (file.conflict) {
-                  statusText = "⚠ Conflict";
-                  statusClass = "preview-conflict";
-
-                } else if (file.status === "misplaced") {
-                  statusText = "⚠ Misplaced";
-                  statusClass = "preview-misplaced";
-                }
-
-                return `
-                  <div class="preview-row">
-
-                    <span title="${file.name}">
-                      ${file.name}
-                    </span>
-
-                    <span class="preview-category">
-                      ${file.category}
-                    </span>
-
-                    <span class="${statusClass}">
-                      ${statusText}
-                    </span>
-
-                  </div>
-                `;
-              }).join("")
-            : `
-              <div class="preview-row">
-                <span>No files found</span>
-                <span>-</span>
-                <span>-</span>
-              </div>
-            `
-        }
-
-      </div>
-    `;
-
-    organizationPreview.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  } catch (error) {
-    console.error("Preview failed:", error);
-
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-
-        <h2>Preview failed</h2>
-
-        <p class="preview-subtitle">
-          ${
-            error.message ||
-            "Could not create organization preview."
-          }
-        </p>
-
-      </div>
-    `;
-
-    organizationPreview.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  } finally {
-    previewButton.textContent =
-      "Preview Organization";
-
-    previewButton.disabled = false;
-  }
-}
-
-async function organizeFiles() {
-  if (!currentFolder) {
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-        <h2>No folder selected</h2>
-        <p class="preview-subtitle">
-          Please choose a folder first.
-        </p>
-      </div>
-    `;
-
-    organizationPreview.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-    return;
-  }
-
-  const confirmed = confirm(
-    "DropFlow will organize the files in this folder. " +
-    "Existing files will never be overwritten. Continue?"
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  organizeButton.textContent = "Organizing...";
-  organizeButton.disabled = true;
-
-  try {
-    const results =
-      await window.dropflow.organizeFiles(
-        currentFolder
-      );
-    
-    undoButton.style.display = "inline-block";
-
-    const successful = results.filter(
-      result => result.success
-    );
-
-    const skipped = results.filter(
-      result => result.skipped
-    );
-
-    const failed = results.filter(
-      result =>
-        !result.success &&
-        !result.skipped
-    );
-
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-
-        <h2>Organization Complete</h2>
-
-        <p class="preview-subtitle">
-          DropFlow finished organizing your files.
-        </p>
-
-        <div class="preview-summary">
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Organized
-            </span>
-
-            <strong class="preview-organized">
-              ${successful.length}
-            </strong>
-          </div>
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Skipped
-            </span>
-
-            <strong class="preview-conflict">
-              ${skipped.length}
-            </strong>
-          </div>
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Failed
-            </span>
-
-            <strong class="preview-misplaced">
-              ${failed.length}
-            </strong>
-          </div>
-
-        </div>
-
-        <p class="preview-success">
-          ✓ No existing files were overwritten.
-        </p>
-
-      </div>
-
-      <div class="preview-table">
-
-        <div class="preview-row preview-header-row">
-          <span>File</span>
-          <span>Status</span>
-          <span>Result</span>
-        </div>
-
-        ${
-          results.length
-            ? results.map(result => {
-
-                let status = "✓ Organized";
-                let statusClass = "preview-organized";
-                let reason = "Moved successfully";
-
-                if (result.skipped) {
-                  status = "⚠ Skipped";
-                  statusClass = "preview-conflict";
-                  reason = "File already exists";
-                }
-
-                if (!result.success && !result.skipped) {
-                  status = "✕ Failed";
-                  statusClass = "preview-misplaced";
-                  reason = result.error || "Unknown error";
-                }
-
-                return `
-                  <div class="preview-row">
-
-                    <span title="${result.file}">
-                      ${result.file}
-                    </span>
-
-                    <span class="${statusClass}">
-                      ${status}
-                    </span>
-
-                    <span>
-                      ${reason}
-                    </span>
-
-                  </div>
-                `;
-              }).join("")
-            : `
-              <div class="preview-row">
-                <span>No files found</span>
-                <span>-</span>
-                <span>-</span>
-              </div>
-            `
-        }
-
-      </div>
-    `;
-
-    organizationPreview.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  } catch (error) {
-    console.error(
-      "Organization failed:",
-      error
-    );
-
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-        <h2>Organization failed</h2>
-
-        <p class="preview-subtitle">
-          ${
-            error.message ||
-            "Could not organize the files."
-          }
-        </p>
-      </div>
-    `;
-
-    organizationPreview.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  } finally {
-    organizeButton.textContent =
-      "Organize Files";
-
-    organizeButton.disabled = false;
-  }
-}
-
-async function showOrganizationConfirmation() {
-  if (!currentFolder || scannedFiles.length === 0) {
-    return;
-  }
-
-  organizationAction.innerHTML = `
-    <div class="organization-confirmation">
-
-      <p>
-        DropFlow is ready to organize
-        ${scannedFiles.length} files.
-      </p>
-
-      <p>
-        Files will be placed into their category folders.
-        Existing files will not be overwritten.
-      </p>
-
-      <button class="cancel-button" id="cancel-organization">
-        Cancel
-      </button>
-
-      <button class="confirm-button" id="confirm-organization">
-        Continue
-      </button>
-
-    </div>
-  `;
-
-  organizationAction.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-
-  document
-    .getElementById("cancel-organization")
-    .addEventListener("click", () => {
-      organizationAction.innerHTML = "";
-    });
-
-  document
-    .getElementById("confirm-organization")
-    .addEventListener("click", async () => {
-
-      const confirmButton =
-        document.getElementById("confirm-organization");
-
-      const cancelButton =
-        document.getElementById("cancel-organization");
-
-      confirmButton.disabled = true;
-      cancelButton.disabled = true;
-
-      confirmButton.textContent = "Organizing...";
+        `;
+        return;
+      }
+
+      previewButton.textContent = "Creating Preview...";
+      previewButton.disabled = true;
 
       try {
         const plan =
@@ -1011,497 +808,618 @@ async function showOrganizationConfirmation() {
             currentFolder
           );
 
-        const safeFiles =
-          plan.filter(file => !file.conflict);
+        const conflictCount =
+          plan.filter(file => file.conflict).length;
 
-        const conflictFiles =
-          plan.filter(file => file.conflict);
+        organizationPreview.innerHTML = `
+          <div class="preview-header">
 
-        let movedCount = 0;
-        let failedCount = 0;
+            <h2>Organization Preview</h2>
 
-        organizationAction.innerHTML = `
-          <div class="organization-confirmation">
-
-            <h2>Organizing Files</h2>
-
-            <p id="organization-progress">
-              Starting...
+            <p class="preview-subtitle">
+              ${plan.length} files can be organized.
+              Nothing will be changed.
             </p>
 
-            <p id="organization-status">
-              Preparing files...
-            </p>
+            ${
+              conflictCount > 0
+                ? `
+                  <p class="preview-warning">
+                    ⚠ ${conflictCount}
+                    ${
+                      conflictCount === 1
+                        ? "conflict"
+                        : "conflicts"
+                    } found.
+                    These files will not be overwritten.
+                  </p>
+                `
+                : `
+                  <p class="preview-success">
+                    ✓ No conflicts found.
+                  </p>
+                `
+            }
 
+          </div>
+
+          <div class="preview-table">
+
+            <div class="preview-row preview-header-row">
+              <span>File</span>
+              <span>Category</span>
+              <span>Status</span>
+            </div>
+
+            ${
+              plan.length
+                ? plan.map(file => {
+
+                    let statusText = "→ Ready";
+                    let statusClass = "preview-ready";
+
+                    if (file.status === "organized") {
+                      statusText = "✓ Already organized";
+                      statusClass = "preview-organized";
+                    } else if (file.conflict) {
+                      statusText = "⚠ Conflict";
+                      statusClass = "preview-conflict";
+                    } else if (file.status === "misplaced") {
+                      statusText = "⚠ Misplaced";
+                      statusClass = "preview-misplaced";
+                    }
+
+                    return `
+                      <div class="preview-row">
+
+                        <span title="${file.name}">
+                          ${file.name}
+                        </span>
+
+                        <span class="preview-category">
+                          ${file.category}
+                        </span>
+
+                        <span class="${statusClass}">
+                          ${statusText}
+                        </span>
+
+                      </div>
+                    `;
+                  }).join("")
+                : `
+                  <div class="preview-row">
+                    <span>No files found</span>
+                    <span>-</span>
+                    <span>-</span>
+                  </div>
+                `
+            }
+
+          </div>
+
+          <div class="button-row" style="justify-content: flex-start;">
+            <button class="choose-button" id="organization-confirm-button">
+              Organize Files
+            </button>
           </div>
         `;
 
-        for (const file of safeFiles) {
+        document
+          .getElementById("organization-confirm-button")
+          .addEventListener("click", showOrganizationConfirmation);
 
-          const result =
-            await window.dropflow.moveFileSafely(file);
+      } catch (error) {
+        console.error("Preview failed:", error);
 
-          if (result.success) {
-            movedCount++;
-          } else {
-            failedCount++;
+        organizationPreview.innerHTML = `
+          <div class="empty-state">
+            <h2>Preview failed</h2>
+            <p>
+              ${
+                error.message ||
+                "Could not create organization preview."
+              }
+            </p>
+          </div>
+        `;
+      } finally {
+        previewButton.textContent =
+          "Preview Organization";
+
+        previewButton.disabled = false;
+      }
+    }
+
+    function showOrganizationConfirmation() {
+      if (!currentFolder || scannedFiles.length === 0) {
+        return;
+      }
+
+      organizationAction.innerHTML = `
+        <div class="organization-confirmation">
+
+          <h2>Ready to organize</h2>
+
+          <p>
+            DropFlow is ready to organize
+            ${scannedFiles.length} files.
+          </p>
+
+          <p>
+            Files will be placed into their category folders.
+            Existing files will not be overwritten.
+          </p>
+
+          <button class="cancel-button" id="cancel-organization">
+            Cancel
+          </button>
+
+          <button class="confirm-button" id="confirm-organization">
+            Continue
+          </button>
+
+        </div>
+      `;
+
+      document
+        .getElementById("cancel-organization")
+        .addEventListener("click", () => {
+          organizationAction.innerHTML = "";
+        });
+
+      document
+        .getElementById("confirm-organization")
+        .addEventListener("click", async () => {
+
+          const confirmButton =
+            document.getElementById(
+              "confirm-organization"
+            );
+
+          const cancelButton =
+            document.getElementById(
+              "cancel-organization"
+            );
+
+          confirmButton.disabled = true;
+          cancelButton.disabled = true;
+          confirmButton.textContent = "Organizing...";
+
+          try {
+            const plan =
+              await window.dropflow.checkOrganizationConflicts(
+                currentFolder
+              );
+
+            const safeFiles =
+              plan.filter(file => !file.conflict);
+
+            const conflictFiles =
+              plan.filter(file => file.conflict);
+
+            let movedCount = 0;
+            let failedCount = 0;
+
+            organizationAction.innerHTML = `
+              <div class="organization-confirmation">
+
+                <h2>Organizing Files</h2>
+
+                <p id="organization-progress">
+                  Starting...
+                </p>
+
+                <p id="organization-status">
+                  Preparing files...
+                </p>
+
+              </div>
+            `;
+
+            for (const file of safeFiles) {
+
+              const result =
+                await window.dropflow.moveFileSafely(
+                  file
+                );
+
+              if (result.success) {
+                movedCount++;
+              } else {
+                failedCount++;
+              }
+
+              document.getElementById(
+                "organization-progress"
+              ).textContent =
+                `${movedCount + failedCount} / ${safeFiles.length} files processed`;
+
+              document.getElementById(
+                "organization-status"
+              ).textContent =
+                `Processing: ${file.name}`;
+            }
+
+            organizationAction.innerHTML = `
+              <div class="organization-confirmation">
+
+                <h2>✓ Organization Complete</h2>
+
+                <p>
+                  ${movedCount} files moved successfully.
+                </p>
+
+                <p>
+                  ${conflictFiles.length}
+                  files skipped because they already exist.
+                </p>
+
+                <p>
+                  ${failedCount}
+                  files could not be moved.
+                </p>
+
+              </div>
+            `;
+
+          } catch (error) {
+            console.error(
+              "Organization failed:",
+              error
+            );
+
+            organizationAction.innerHTML = `
+              <div class="organization-confirmation">
+
+                <h2>Organization Failed</h2>
+
+                <p>
+                  ${
+                    error.message ||
+                    "Something went wrong while organizing files."
+                  }
+                </p>
+
+              </div>
+            `;
+          }
+        });
+    }
+
+    async function showDuplicates() {
+      if (!currentFolder) {
+        duplicateResults.innerHTML = `
+          <div class="empty-state">
+            <h2>No folder selected</h2>
+            <p>Please choose a folder first.</p>
+          </div>
+        `;
+        return;
+      }
+
+      duplicateButton.textContent =
+        "Finding Duplicates...";
+
+      duplicateButton.disabled = true;
+
+      try {
+        const duplicateGroups =
+          await window.dropflow.findDuplicates(
+            currentFolder
+          );
+
+        if (duplicateGroups.length === 0) {
+
+          duplicateResults.innerHTML = `
+            <div class="empty-state">
+
+              <h2>No Duplicates Found</h2>
+
+              <p>
+                DropFlow didn't find any duplicate
+                files in this folder.
+              </p>
+
+              <p class="preview-success">
+                ✓ Your folder looks clean.
+              </p>
+
+            </div>
+          `;
+
+        } else {
+
+          let duplicateFileCount = 0;
+          let duplicateStorage = 0;
+
+          const processedGroups =
+            duplicateGroups.map(group => {
+
+              const sortedGroup =
+                [...group].sort((a, b) => {
+
+                  const aName =
+                    a.name.toLowerCase();
+
+                  const bName =
+                    b.name.toLowerCase();
+
+                  const aCopyScore =
+                    (aName.includes("copy") ? 1 : 0) +
+                    (/\(\d+\)/.test(aName) ? 1 : 0);
+
+                  const bCopyScore =
+                    (bName.includes("copy") ? 1 : 0) +
+                    (/\(\d+\)/.test(bName) ? 1 : 0);
+
+                  return aCopyScore - bCopyScore;
+                });
+
+              const duplicates =
+                sortedGroup.slice(1);
+
+              duplicateFileCount +=
+                duplicates.length;
+
+              for (const file of duplicates) {
+                duplicateStorage += file.size;
+              }
+
+              return sortedGroup;
+            });
+
+          function formatStorage(bytes) {
+
+            if (bytes < 1024) {
+              return `${bytes} B`;
+            }
+
+            if (bytes < 1024 * 1024) {
+              return `${(
+                bytes / 1024
+              ).toFixed(1)} KB`;
+            }
+
+            if (bytes < 1024 * 1024 * 1024) {
+              return `${(
+                bytes /
+                (1024 * 1024)
+              ).toFixed(1)} MB`;
+            }
+
+            return `${(
+              bytes /
+              (1024 * 1024 * 1024)
+            ).toFixed(1)} GB`;
           }
 
-          document.getElementById(
-            "organization-progress"
-          ).textContent =
-            `${movedCount + failedCount} / ${safeFiles.length} files processed`;
+          duplicateResults.innerHTML = `
 
-          document.getElementById(
-            "organization-status"
-          ).textContent =
-            `Processing: ${file.name}`;
+            <div class="preview-header">
+
+              <h2>Duplicate Analysis</h2>
+
+              <p class="preview-subtitle">
+                Found ${duplicateGroups.length}
+                duplicate group${
+                  duplicateGroups.length === 1
+                    ? ""
+                    : "s"
+                }.
+              </p>
+
+              <div class="preview-summary">
+
+                <div class="preview-summary-card">
+                  <span class="preview-summary-label">
+                    Duplicate Files
+                  </span>
+
+                  <strong>
+                    ${duplicateFileCount}
+                  </strong>
+                </div>
+
+                <div class="preview-summary-card">
+                  <span class="preview-summary-label">
+                    Potential Storage Saved
+                  </span>
+
+                  <strong>
+                    ${formatStorage(
+                      duplicateStorage
+                    )}
+                  </strong>
+                </div>
+
+                <div class="preview-summary-card">
+                  <span class="preview-summary-label">
+                    Duplicate Groups
+                  </span>
+
+                  <strong>
+                    ${duplicateGroups.length}
+                  </strong>
+                </div>
+
+              </div>
+
+              <p class="preview-warning">
+                Nothing will be deleted.
+              </p>
+
+            </div>
+
+            <div class="preview-table">
+
+              ${processedGroups.map(
+                (group, index) => `
+                  <div class="duplicate-group">
+
+                    <div class="duplicate-group-title">
+                      Duplicate Group ${index + 1}
+                    </div>
+
+                    ${group.map(
+                      (file, fileIndex) => `
+                        <div class="preview-row">
+
+                          <span title="${file.name}">
+                            ${file.name}
+                          </span>
+
+                          <span>
+                            ${formatStorage(file.size)}
+                          </span>
+
+                          <span class="${
+                            fileIndex === 0
+                              ? "preview-ready"
+                              : "preview-warning"
+                          }">
+                            ${
+                              fileIndex === 0
+                                ? "✓ Original"
+                                : "Duplicate"
+                            }
+                          </span>
+
+                        </div>
+                      `
+                    ).join("")}
+
+                  </div>
+                `
+              ).join("")}
+
+            </div>
+          `;
         }
-
-        organizationAction.innerHTML = `
-          <div class="organization-confirmation">
-
-            <h2>✓ Organization Complete</h2>
-
-            <p>
-              ${movedCount} files moved successfully.
-            </p>
-
-            <p>
-              ${conflictFiles.length} files skipped because
-              they already exist in the destination.
-            </p>
-
-            <p>
-              ${failedCount} files could not be moved.
-            </p>
-
-          </div>
-        `;
 
       } catch (error) {
 
         console.error(
-          "Organization failed:",
+          "Duplicate detection failed:",
           error
         );
 
-        organizationAction.innerHTML = `
-          <div class="organization-confirmation">
+        duplicateResults.innerHTML = `
+          <div class="empty-state">
 
-            <h2>Organization Failed</h2>
+            <h2>Duplicate scan failed</h2>
 
             <p>
               ${
                 error.message ||
-                "Something went wrong while organizing files."
+                "Could not find duplicate files."
               }
             </p>
 
           </div>
         `;
-      }
-    });
-}
 
-async function undoOrganization() {
-  const confirmed = confirm(
-    "Undo the last organization? " +
-    "Files will be moved back to their original locations."
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  undoButton.textContent = "Undoing...";
-  undoButton.disabled = true;
-
-  try {
-    const result =
-      await window.dropflow.undoOrganization();
-
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-
-        <h2>Undo Complete</h2>
-
-        <p class="preview-subtitle">
-          DropFlow restored the files from the
-          last organization.
-        </p>
-
-        <div class="preview-summary">
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Restored
-            </span>
-
-            <strong class="preview-organized">
-              ${result.restored}
-            </strong>
-          </div>
-
-          <div class="preview-summary-card">
-            <span class="preview-summary-label">
-              Failed
-            </span>
-
-            <strong class="preview-conflict">
-              ${result.failed}
-            </strong>
-          </div>
-
-        </div>
-
-        ${
-          result.failed === 0
-            ? `
-              <p class="preview-success">
-                ✓ All possible files were restored.
-              </p>
-            `
-            : `
-              <p class="preview-warning">
-                ⚠ ${result.failed}
-                ${
-                  result.failed === 1
-                    ? "file could not"
-                    : "files could not"
-                } be restored.
-              </p>
-            `
-        }
-
-      </div>
-    `;
-
-    undoButton.style.display = "none";
-
-    organizationPreview.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  } catch (error) {
-    console.error("Undo failed:", error);
-
-    organizationPreview.innerHTML = `
-      <div class="preview-header">
-        <h2>Undo failed</h2>
-
-        <p class="preview-subtitle">
-          ${
-            error.message ||
-            "Could not undo the last organization."
-          }
-        </p>
-      </div>
-    `;
-
-  } finally {
-    undoButton.textContent =
-      "Undo Last Organization";
-
-    undoButton.disabled = false;
-  }
-}
-
-undoButton.addEventListener(
-  "click",
-  undoOrganization
-);
-
-    previewButton.addEventListener(
-    "click",
-    showOrganizationPreview
-    );
-
-    chooseButton.addEventListener("click", async () => {
-      const folder = await window.dropflow.chooseFolder();
-      if (!folder) return;
-
-      currentFolder = folder;
-      selectedFolder.textContent = `Selected: ${folder}`;
-      scanButton.style.display = "inline-block";
-      scanResults.innerHTML = "";
-      previewButton.style.display = "none";
-      organizationPreview.innerHTML = "";
-      organizeButton.style.display = "none";
-      organizationAction.innerHTML = "";
-    });
-
-    organizeButton.addEventListener(
-      "click",
-    organizeFiles
-    );  
-
-    organizeButton.addEventListener(
-      "click",
-    showOrganizationConfirmation
-    );
-
-    scanButton.addEventListener("click", async () => {
-      if (!currentFolder) return;
-
-      scanButton.textContent = "Scanning...";
-      scanButton.disabled = true;
-
-      try {
-        const files = await window.dropflow.scanFolder(currentFolder);
-        scannedFiles = files;
-        categorySummary.style.display = "grid";
-        fileControls.style.display = "flex";
-        renderCategorySummary();
-        renderFiles();
-        previewButton.style.display = "inline-block";
-        organizationPreview.innerHTML = "";
-        organizeButton.style.display = "inline-block";
-        organizationAction.innerHTML = "";
-
-
-        const header = fileRow(["File name", "Type", "Category", "Size"]);
-        const rows = files.length
-          ? files.map(file => fileRow([file.name, file.extension, file.category, file.size])).join("")
-          : fileRow(["No files found", "-", "-", "-"]);
-
-        scanResults.innerHTML = `
-          <h2>${files.length} files found</h2>
-          <div class="file-table">
-            <div class="file-row file-header">${header.replace(/<div class="file-row">|<\/div>/g, "")}</div>
-            ${rows}
-          </div>
-        `;
-      } catch (error) {
-        console.error(error);
-        scanResults.innerHTML = "<p>Could not scan this folder.</p>";
       } finally {
-        scanButton.textContent = "Scan Folder";
-        scanButton.disabled = false;
+
+        duplicateButton.textContent =
+          "Find Duplicates";
+
+        duplicateButton.disabled = false;
       }
-    });
-
-async function showDuplicates() {
-  if (!currentFolder) {
-    duplicateResults.innerHTML = `
-      <p class="notice">
-        Please choose a folder first.
-      </p>
-    `;
-    return;
-  }
-
-  duplicateButton.textContent = "Finding Duplicates...";
-  duplicateButton.disabled = true;
-
-  try {
-    const duplicateGroups =
-      await window.dropflow.findDuplicates(
-        currentFolder
-      );
-
-    if (duplicateGroups.length === 0) {
-      duplicateResults.innerHTML = `
-        <div class="preview-header">
-          <h2>No Duplicates Found</h2>
-
-          <p class="preview-subtitle">
-            DropFlow didn't find any duplicate files
-            in this folder.
-          </p>
-
-          <p class="preview-success">
-            ✓ Your folder looks clean.
-          </p>
-        </div>
-      `;
-    } else {
-      let duplicateFileCount = 0;
-      let duplicateStorage = 0;
-
-      const processedGroups =
-        duplicateGroups.map(group => {
-          const sortedGroup = [...group].sort(
-            (a, b) => {
-              const aName = a.name.toLowerCase();
-              const bName = b.name.toLowerCase();
-
-              const aCopyScore =
-                (aName.includes("copy") ? 1 : 0) +
-                (/\(\d+\)/.test(aName) ? 1 : 0);
-
-              const bCopyScore =
-                (bName.includes("copy") ? 1 : 0) +
-                (/\(\d+\)/.test(bName) ? 1 : 0);
-
-              return aCopyScore - bCopyScore;
-            }
-          );
-
-          const duplicates =
-            sortedGroup.slice(1);
-
-          duplicateFileCount += duplicates.length;
-
-          for (const file of duplicates) {
-            duplicateStorage += file.size;
-          }
-
-          return sortedGroup;
-        });
-
-      function formatStorage(bytes) {
-        if (bytes < 1024) {
-          return `${bytes} B`;
-        }
-
-        if (bytes < 1024 * 1024) {
-          return `${(bytes / 1024).toFixed(1)} KB`;
-        }
-
-        if (bytes < 1024 * 1024 * 1024) {
-          return `${(
-            bytes /
-            (1024 * 1024)
-          ).toFixed(1)} MB`;
-        }
-
-        return `${(
-          bytes /
-          (1024 * 1024 * 1024)
-        ).toFixed(1)} GB`;
-      }
-
-      duplicateResults.innerHTML = `
-        <div class="preview-header">
-
-          <h2>Duplicate Analysis</h2>
-
-          <p class="preview-subtitle">
-            Found ${duplicateGroups.length}
-            duplicate group${
-              duplicateGroups.length === 1
-                ? ""
-                : "s"
-            }.
-          </p>
-
-          <div class="preview-summary">
-
-            <div class="preview-summary-card">
-              <span class="preview-summary-label">
-                Duplicate Files
-              </span>
-
-              <strong>
-                ${duplicateFileCount}
-              </strong>
-            </div>
-
-            <div class="preview-summary-card">
-              <span class="preview-summary-label">
-                Potential Storage Saved
-              </span>
-
-              <strong>
-                ${formatStorage(duplicateStorage)}
-              </strong>
-            </div>
-
-          </div>
-
-          <p class="preview-warning">
-            Nothing will be deleted.
-          </p>
-
-        </div>
-
-        <div class="preview-table">
-
-          ${processedGroups.map(
-            (group, index) => `
-              <div class="duplicate-group">
-
-                <div class="duplicate-group-title">
-                  Duplicate Group ${index + 1}
-                </div>
-
-                ${group.map(
-                  (file, fileIndex) => `
-                    <div class="preview-row">
-
-                      <span title="${file.name}">
-                        ${file.name}
-                      </span>
-
-                      <span>
-                        ${formatStorage(file.size)}
-                      </span>
-
-                      <span class="${
-                        fileIndex === 0
-                          ? "preview-ready"
-                          : "preview-warning"
-                      }">
-                        ${
-                          fileIndex === 0
-                            ? "✓ Original"
-                            : "Duplicate"
-                        }
-                      </span>
-
-                    </div>
-                  `
-                ).join("")}
-
-              </div>
-            `
-          ).join("")}
-
-        </div>
-      `;
     }
 
-    duplicateResults.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+    chooseButton.addEventListener(
+      "click",
+      async () => {
 
-  } catch (error) {
-    console.error(
-      "Duplicate detection failed:",
-      error
+        const folder =
+          await window.dropflow.chooseFolder();
+
+        if (!folder) {
+          return;
+        }
+
+        currentFolder = folder;
+
+        selectedFolder.textContent =
+          folder;
+
+        folderBox.style.display =
+          "block";
+
+        homeActions.style.display =
+          "flex";
+
+        scannedFiles = [];
+        scanResults.innerHTML = "";
+        categorySummary.innerHTML = "";
+        fileControls.style.display = "none";
+        scanActions.style.display = "none";
+        organizationPreview.innerHTML = "";
+        organizationAction.innerHTML = "";
+        duplicateResults.innerHTML = "";
+      }
     );
 
-    duplicateResults.innerHTML = `
-      <div class="preview-header">
-        <h2>Duplicate scan failed</h2>
+    scanButton.addEventListener(
+      "click",
+      async () => {
 
-        <p class="preview-subtitle">
-          ${
-            error.message ||
-            "Could not find duplicate files."
-          }
-        </p>
-      </div>
-    `;
-  } finally {
-    duplicateButton.textContent =
-      "Find Duplicates";
+        showScreen("scan");
 
-    duplicateButton.disabled = false;
-  }
-}
+        await scanCurrentFolder();
+      }
+    );
 
-duplicateButton.addEventListener(
-  "click",
-  showDuplicates
-);
+    scanAgainButton.addEventListener(
+      "click",
+      scanCurrentFolder
+    );
 
-    fileSearch.addEventListener("input", renderFiles);
+    previewButton.addEventListener(
+      "click",
+      () => {
 
-    categoryFilter.addEventListener("change", renderFiles);
+        showScreen("organization");
+
+        showOrganizationPreview();
+      }
+    );
+
+    organizeButton.addEventListener(
+      "click",
+      () => {
+
+        showScreen("organization");
+
+        showOrganizationConfirmation();
+      }
+    );
+
+    duplicateHomeButton.addEventListener(
+      "click",
+      () => {
+
+        showScreen("duplicate");
+
+        showDuplicates();
+      }
+    );
+
+    duplicateButton.addEventListener(
+      "click",
+      showDuplicates
+    );
+
+    fileSearch.addEventListener(
+      "input",
+      renderFiles
+    );
+
+    categoryFilter.addEventListener(
+      "change",
+      renderFiles
+    );
   </script>
 
 </body>
