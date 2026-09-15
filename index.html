@@ -64,7 +64,75 @@
 
     .home-screen {
       text-align: center;
-      padding-top: 70px;
+      padding-top: 45px;
+    }
+
+    .home-screen .logo {
+      font-size: 52px;
+      margin-bottom: 12px;
+    }
+
+    .home-subtitle {
+      color: #9ca3af;
+      font-size: 17px;
+      line-height: 1.6;
+      margin-bottom: 35px;
+    }
+
+    .home-actions {
+      max-width: 760px;
+      margin: 30px auto 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .home-action {
+      min-height: 125px;
+      padding: 24px 18px;
+      border: 1px solid #252a33;
+      border-radius: 12px;
+      background: #181b21;
+      color: #ffffff;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .home-action:hover {
+      transform: translateY(-3px);
+      border-color: #3a4150;
+    }
+
+    .home-action h3 {
+      font-size: 17px;
+      margin-bottom: 9px;
+    }
+
+    .home-action p {
+      color: #9ca3af;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .folder-box {
+      max-width: 760px;
+      margin: 25px auto 0;
+      padding: 16px 18px;
+      background: #181b21;
+      border: 1px solid #252a33;
+      border-radius: 12px;
+      text-align: left;
+    }
+
+    .home-choose {
+      margin-top: 25px;
+    }
+
+    @media (max-width: 800px) {
+      .home-actions {
+        grid-template-columns: 1fr;
+      }
     }
 
     .home-screen .logo {
@@ -449,41 +517,55 @@
       <button class="back-button" id="back-button">← Back</button>
     </div>
 
-    <section class="screen active" id="home-screen">
+<section class="screen active" id="home-screen">
 
-      <div class="home-screen">
+  <div class="home-screen">
 
-        <div class="logo">DropFlow</div>
+    <div class="logo">DropFlow</div>
 
-        <p class="subtitle">
-          Keep your files organized.<br>
-          Automatically.
+    <p class="home-subtitle">
+      Organize your files without the headache.
+    </p>
+
+    <div class="home-choose">
+      <button class="choose-button" id="choose-folder">
+        Choose Folder
+      </button>
+    </div>
+
+    <div class="folder-box" id="folder-box" style="display: none;">
+      <div class="folder-label">Selected folder</div>
+      <div class="selected-folder" id="selected-folder"></div>
+    </div>
+
+    <div class="home-actions" id="home-actions" style="display: none;">
+
+      <button class="home-action" id="scan-folder">
+        <h3>Scan Files</h3>
+        <p>
+          See what's inside your folder and filter the results.
         </p>
+      </button>
 
-        <div class="button-row">
-          <button class="choose-button" id="choose-folder">
-            Choose Folder
-          </button>
-        </div>
+      <button class="home-action" id="organize-home">
+        <h3>Organize Files</h3>
+        <p>
+          Sort your files into simple category folders.
+        </p>
+      </button>
 
-        <div class="folder-box" id="folder-box" style="display: none;">
-          <div class="folder-label">Selected folder</div>
-          <div class="selected-folder" id="selected-folder"></div>
-        </div>
+      <button class="home-action" id="duplicates-home">
+        <h3>Find Duplicates</h3>
+        <p>
+          Find identical files and check how much space they use.
+        </p>
+      </button>
 
-        <div class="button-row" id="home-actions" style="display: none;">
-          <button class="choose-button" id="scan-folder">
-            Scan Folder
-          </button>
+    </div>
 
-          <button class="secondary-button" id="duplicates-home">
-            Find Duplicates
-          </button>
-        </div>
+  </div>
 
-      </div>
-
-    </section>
+</section>
 
     <section class="screen" id="scan-screen">
 
@@ -590,21 +672,17 @@
 
     const previewButton = document.getElementById("preview-organization");
     const organizeButton = document.getElementById("organize-files");
+    const organizeHomeButton = document.getElementById("organize-home");
 
-    const organizationPreview =
-      document.getElementById("organization-preview");
+    const organizationPreview = document.getElementById("organization-preview");
 
-    const organizationAction =
-      document.getElementById("organization-action");
+    const organizationAction = document.getElementById("organization-action");
 
-    const duplicateButton =
-      document.getElementById("find-duplicates");
+    const duplicateButton = document.getElementById("find-duplicates");
 
-    const duplicateHomeButton =
-      document.getElementById("duplicates-home");
+    const duplicateHomeButton = document.getElementById("duplicates-home");
 
-    const duplicateResults =
-      document.getElementById("duplicate-results");
+    const duplicateResults = document.getElementById("duplicate-results");
 
     let scannedFiles = [];
     let currentFolder = null;
@@ -1419,6 +1497,14 @@
     categoryFilter.addEventListener(
       "change",
       renderFiles
+    );
+
+    organizeHomeButton.addEventListener(
+      "click",
+      () => {
+        showScreen("organization");
+        showOrganizationConfirmation();
+      }
     );
   </script>
 
