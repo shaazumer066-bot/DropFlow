@@ -4,13 +4,30 @@
   "description": "A frictionless file organization desktop app",
   "main": "src/main/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder --win"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "electron": "^44.3.0"
+    "electron": "^44.3.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.shaazumer.dropflow",
+    "productName": "DropFlow",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable"
+    }
   }
 }
