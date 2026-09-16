@@ -590,6 +590,22 @@
   color: #6b7280;
   font-size: 13px;
 }
+
+.category-preview {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.category-preview .preview-summary-card {
+  min-height: 75px;
+}
+
+#organization-preview {
+  margin-top: 20px;
+}
+
+#organization-action {
+  margin-top: 20px;
+}
   </style>
 </head>
 
@@ -986,148 +1002,195 @@
       }
     }
 
-    async function showOrganizationPreview() {
-      if (!currentFolder) {
-        organizationPreview.innerHTML = `
-          <div class="empty-state">
-            <h2>No folder selected</h2>
-            <p>Please choose a folder first.</p>
-          </div>
-        `;
-        return;
+async function showOrganizationPreview() {
+  if (!currentFolder) {
+    organizationPreview.innerHTML = `
+      <div class="empty-state">
+        <h2>No folder selected</h2>
+        <p>Please choose a folder first.</p>
+      </div>
+    `;
+    return;
+  }
+
+  previewButton.textContent = "Creating Preview...";
+  previewButton.disabled = true;
+
+  try {
+    const plan =
+      await window.dropflow.checkOrganizationConflicts(
+        currentFolder
+      );
+
+    const conflictCount =
+      plan.filter(file => file.conflict).length;
+
+    const readyCount =
+      plan.filter(file => !file.conflict).length;
+
+    const categoryCounts = {};
+
+    for (const file of plan) {
+      if (!categoryCounts[file.category]) {
+        categoryCounts[file.category] = 0;
       }
 
-      previewButton.textContent = "Creating Preview...";
-      previewButton.disabled = true;
-
-      try {
-        const plan =
-          await window.dropflow.checkOrganizationConflicts(
-            currentFolder
-          );
-
-        const conflictCount =
-          plan.filter(file => file.conflict).length;
-
-        organizationPreview.innerHTML = `
-          <div class="preview-header">
-
-            <h2>Organization Preview</h2>
-
-            <p class="preview-subtitle">
-              ${plan.length} files can be organized.
-              Nothing will be changed.
-            </p>
-
-            ${
-              conflictCount > 0
-                ? `
-                  <p class="preview-warning">
-                    ⚠ ${conflictCount}
-                    ${
-                      conflictCount === 1
-                        ? "conflict"
-                        : "conflicts"
-                    } found.
-                    These files will not be overwritten.
-                  </p>
-                `
-                : `
-                  <p class="preview-success">
-                    ✓ No conflicts found.
-                  </p>
-                `
-            }
-
-          </div>
-
-          <div class="preview-table">
-
-            <div class="preview-row preview-header-row">
-              <span>File</span>
-              <span>Category</span>
-              <span>Status</span>
-            </div>
-
-            ${
-              plan.length
-                ? plan.map(file => {
-
-                    let statusText = "→ Ready";
-                    let statusClass = "preview-ready";
-
-                    if (file.status === "organized") {
-                      statusText = "✓ Already organized";
-                      statusClass = "preview-organized";
-                    } else if (file.conflict) {
-                      statusText = "⚠ Conflict";
-                      statusClass = "preview-conflict";
-                    } else if (file.status === "misplaced") {
-                      statusText = "⚠ Misplaced";
-                      statusClass = "preview-misplaced";
-                    }
-
-                    return `
-                      <div class="preview-row">
-
-                        <span title="${file.name}">
-                          ${file.name}
-                        </span>
-
-                        <span class="preview-category">
-                          ${file.category}
-                        </span>
-
-                        <span class="${statusClass}">
-                          ${statusText}
-                        </span>
-
-                      </div>
-                    `;
-                  }).join("")
-                : `
-                  <div class="preview-row">
-                    <span>No files found</span>
-                    <span>-</span>
-                    <span>-</span>
-                  </div>
-                `
-            }
-
-          </div>
-
-          <div class="button-row" style="justify-content: flex-start;">
-            <button class="choose-button" id="organization-confirm-button">
-              Organize Files
-            </button>
-          </div>
-        `;
-
-        document
-          .getElementById("organization-confirm-button")
-          .addEventListener("click", showOrganizationConfirmation);
-
-      } catch (error) {
-        console.error("Preview failed:", error);
-
-        organizationPreview.innerHTML = `
-          <div class="empty-state">
-            <h2>Preview failed</h2>
-            <p>
-              ${
-                error.message ||
-                "Could not create organization preview."
-              }
-            </p>
-          </div>
-        `;
-      } finally {
-        previewButton.textContent =
-          "Preview Organization";
-
-        previewButton.disabled = false;
-      }
+      categoryCounts[file.category]++;
     }
+
+    organizationPreview.innerHTML = `
+      <div class="preview-header">
+        <h2>Organization Preview</h2>
+
+        <p class="preview-subtitle">
+          Review the changes before anything is moved.
+        </p>
+      </div>
+
+      <div class="preview-summary">
+
+        <div class="preview-summary-card">
+          <span class="preview-summary-label">
+            Files
+          </span>
+          <strong>${plan.length}</strong>
+        </div>
+
+        <div class="preview-summary-card">
+          <span class="preview-summary-label">
+            Ready
+          </span>
+          <strong>${readyCount}</strong>
+        </div>
+
+        <div class="preview-summary-card">
+          <span class="preview-summary-label">
+            Conflicts
+          </span>
+          <strong>${conflictCount}</strong>
+        </div>
+
+      </div>
+
+      ${
+        conflictCount > 0
+          ? `
+            <p class="preview-warning">
+              ⚠ ${conflictCount}
+              ${
+                conflictCount === 1
+                  ? "file has"
+                  : "files have"
+              } an existing destination.
+            </p>
+          `
+          : `
+            <p class="preview-success">
+              ✓ Everything is ready to organize.
+            </p>
+          `
+      }
+
+      <div class="preview-summary category-preview">
+
+        ${Object.entries(categoryCounts)
+          .map(([category, count]) => `
+            <div class="preview-summary-card">
+              <span class="preview-summary-label">
+                ${category}
+              </span>
+              <strong>${count}</strong>
+            </div>
+          `)
+          .join("")}
+
+      </div>
+
+      <div class="preview-table">
+
+        <div class="preview-row preview-header-row">
+          <span>File</span>
+          <span>Category</span>
+          <span>Status</span>
+        </div>
+
+        ${
+          plan.length
+            ? plan.map(file => `
+                <div class="preview-row">
+
+                  <span title="${file.name}">
+                    ${file.name}
+                  </span>
+
+                  <span class="preview-category">
+                    ${file.category}
+                  </span>
+
+                  <span class="${
+                    file.conflict
+                      ? "preview-conflict"
+                      : "preview-ready"
+                  }">
+                    ${
+                      file.conflict
+                        ? "⚠ Conflict"
+                        : "✓ Ready"
+                    }
+                  </span>
+
+                </div>
+              `).join("")
+            : `
+              <div class="preview-row">
+                <span>No files found</span>
+                <span>-</span>
+                <span>-</span>
+              </div>
+            `
+        }
+
+      </div>
+
+      <div class="button-row" style="justify-content: flex-start;">
+        <button
+          class="choose-button"
+          id="organization-confirm-button"
+          ${readyCount === 0 ? "disabled" : ""}
+        >
+          Organize ${readyCount} Files
+        </button>
+      </div>
+    `;
+
+    document
+      .getElementById("organization-confirm-button")
+      .addEventListener(
+        "click",
+        showOrganizationConfirmation
+      );
+
+  } catch (error) {
+    console.error("Preview failed:", error);
+
+    organizationPreview.innerHTML = `
+      <div class="empty-state">
+        <h2>Preview failed</h2>
+        <p>
+          ${
+            error.message ||
+            "Could not create organization preview."
+          }
+        </p>
+      </div>
+    `;
+  } finally {
+    previewButton.textContent =
+      "Preview Organization";
+
+    previewButton.disabled = false;
+  }
+}
 
     function showOrganizationConfirmation() {
       if (!currentFolder || scannedFiles.length === 0) {
